@@ -8,6 +8,10 @@ public class Individual {
         this.fitness = calculateFitness();
         this.probability = 0;
     }
+
+    public int getEncoding(){
+        return this.encoding;
+    }
     public double getFitness(){
         return this.fitness;
     }

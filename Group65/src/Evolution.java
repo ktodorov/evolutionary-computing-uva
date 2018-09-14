@@ -1,9 +1,7 @@
-import java.sql.SQLOutput;
-
 public class Evolution {
     //Helper functions and main() method
     //Define Global Static Variables here
-    public final static int POPULATION_SIZE = 5;
+    public final static int POPULATION_SIZE = 10;
     public Evolution(){
     }
 
@@ -39,8 +37,29 @@ public class Evolution {
     }
 
     public static void main(String[] args){
+        //PSEUDOCODE EVOLUTIONARY ALGORITHM
+        //INITIALIZE
+        //EVALUATE
+        //REPEAT UNTIL TERMINATION CONDITION
+        // SELECT PARENTS
+        // RECOMBINE
+        // MUTATE
+        // EVALUATE
+        // SELECT FOR NEXT GEN
+
         Population germans = new Population();
         germans.calculateOverallFitness();
         System.out.println("Overall fitness: "+germans.getOverallFitness());
+        //10 generations for now
+        for (int i = 0; i < 10; i++) {
+            //select 5 parents randomly
+            for (int j = 0; j < 5; j++) {
+                germans.getPeople()[(int)(Math.random()*POPULATION_SIZE)].getEncoding();
+            }
+            //RECOMBINE TBD
+            //MUTATE
+
+            //select 5 children by 'highest fitness'
+        }
     }
 }

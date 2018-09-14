@@ -8,7 +8,8 @@ public class Population {
         this.people = new Individual[Evolution.POPULATION_SIZE];
         for (int i = 0; i < this.people.length; i++) {
             this.people[i] = new Individual();
-            System.out.println("Fitness of individual "+(i+1)+": "+this.people[i].getFitness());
+            //Testing purposes
+            //System.out.println("Fitness of individual "+(i+1)+": "+this.people[i].getFitness());
         }
     }
     public Individual[] getPeople(){
