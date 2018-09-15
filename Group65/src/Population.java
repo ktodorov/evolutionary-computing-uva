@@ -1,5 +1,3 @@
-import com.sun.tools.javac.Main;
-
 public class Population {
     private Individual[] people;
     private double overallFitness;
