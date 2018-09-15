@@ -8,7 +8,13 @@ public class Individual {
         this.fitness = calculateFitness();
         this.probability = 0;
     }
-
+    public void printMe(){
+        System.out.println("Encoding: "+this.encoding+", Decoding: "+Evolution.printBinary(Evolution.makeBinary(this.encoding, 5))+", Fitness: "+ this.fitness);
+    }
+    public void setEncoding(int x){
+        this.encoding = x;
+        this.fitness = calculateFitness();
+    }
     public int getEncoding(){
         return this.encoding;
     }

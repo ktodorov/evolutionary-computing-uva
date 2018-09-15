@@ -30,10 +30,22 @@ public class Evolution {
     }
 
     //print a binary to the console for testing purposes
-    public static void printBinary(int[] x){
+    public static String printBinary(int[] x){
+        String result = "";
         for (int i = 0; i < x.length; i++){
-            System.out.print(x[i]);
+            result += x[i];
         }
+        return result;
+    }
+    public static int[] mutate(int[] x){
+        int randomIndex = (int)(Math.random()*x.length);
+        if (x[randomIndex] == 1){
+            x[randomIndex] = 0;
+        }
+        else{
+            x[randomIndex] = 1;
+        }
+        return x;
     }
 
     public static void main(String[] args){
@@ -48,18 +60,67 @@ public class Evolution {
         // SELECT FOR NEXT GEN
 
         Population germans = new Population();
-        germans.calculateOverallFitness();
-        System.out.println("Overall fitness: "+germans.getOverallFitness());
-        //10 generations for now
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
+            System.out.println("Overall population fitness: " + germans.getOverallFitness());
+            System.out.println("Highest individual fitness: " + germans.highestIndividualFitness());
             //select 5 parents randomly
+            Individual[] bufferParents = new Individual[5];
             for (int j = 0; j < 5; j++) {
-                germans.getPeople()[(int)(Math.random()*POPULATION_SIZE)].getEncoding();
+                bufferParents[j] = new Individual();
+                //NOTE: In this case one individual can be chosen twice as a parent
+                bufferParents[j].setEncoding(germans.getPeople()[(int)(Math.random()*POPULATION_SIZE)].getEncoding());
             }
-            //RECOMBINE TBD
-            //MUTATE
 
-            //select 5 children by 'highest fitness'
+            //Testing purposes
+            /*
+            System.out.println("parents");
+            for (Individual o : bufferParents) {
+                o.printMe();
+            }
+            */
+            //RECOMBINE first 4 children out of 5 parents
+            Individual[] bufferChildren = new Individual[5];
+            //cutoff between 1 and 4 to avoid swapping individuals entirely
+            int cutoff = (int)(Math.random()*4)+1;
+            //System.out.println("Cutoff: "+cutoff);
+            for (int k = 0; k < 5-1; k++) {
+                bufferChildren[k] = new Individual();
+                int[] parent1 = makeBinary(bufferParents[k].getEncoding(), 5);
+                int[] parent2 = makeBinary(bufferParents[k+1].getEncoding(), 5);
+                int[] recombination = new int[5];
+                for (int m = 0; m < 5-cutoff; m++){
+                       recombination[m] = parent1[m];
+                }
+                for (int n = 5-cutoff; n < 5; n++){
+                    recombination[n] = parent2[n];
+                }
+                bufferChildren[k].setEncoding(makeDecimal(recombination));
+            }
+            //MUTATE last child by mutating last parent
+            //Todo: combine binary/decimal conversion in mutate method?
+            bufferChildren[4] = new Individual();
+            bufferChildren[4].setEncoding(makeDecimal(mutate(makeBinary(bufferParents[4].getEncoding(), 5))));
+
+            //Testing purposes
+            /*
+            System.out.println("children");
+            for (Individual p : bufferChildren) {
+                p.printMe();
+            }
+            */
+
+            //SELECT children by 'highest fitness' for next generation.
+            for (int t = 0; t < bufferChildren.length; t++) {
+                int indexOfWorst = 0;
+                for (int s = 0; s < germans.getPeople().length; s++) {
+                    if(germans.getPeople()[s].getFitness() < germans.getPeople()[indexOfWorst].getFitness()){
+                        indexOfWorst = s;
+                    }
+                }
+                if(bufferChildren[t].getFitness() > germans.getPeople()[indexOfWorst].getFitness()){
+                    germans.getPeople()[indexOfWorst].setEncoding(bufferChildren[t].getEncoding());
+                }
+            }
         }
     }
 }

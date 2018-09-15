@@ -10,9 +10,27 @@ public class Population {
             //System.out.println("Fitness of individual "+(i+1)+": "+this.people[i].getFitness());
         }
     }
+    public void print(){
+        int k = 0;
+        for (Individual i: this.people) {
+            System.out.println("Fitness of individual "+(k++)+": "+i.getFitness());
+        }
+
+    }
     public Individual[] getPeople(){
         return this.people;
     }
+
+    public double highestIndividualFitness(){
+        double bestFitness = -1.0;
+        for (int s = 0; s < this.people.length; s++) {
+            if(this.people[s].getFitness() > bestFitness){
+                bestFitness = this.people[s].getFitness();
+            }
+        }
+        return bestFitness;
+    }
+
     //Calculate the sum over all individuals' fitness
     public void calculateOverallFitness(){
         double result = 0;
@@ -22,6 +40,7 @@ public class Population {
         this.overallFitness = result;
     }
     public double getOverallFitness(){
+        this.calculateOverallFitness();
         return this.overallFitness;
     }
     //Calculate and set the probability for each individual based on its fitness
