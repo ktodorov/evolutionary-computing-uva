@@ -4,18 +4,20 @@ import Constants.Constants;
 
 public class Evolution {
     public static void startEvolutionaryAlgorithm(){
+
         //PSEUDOCODE EVOLUTIONARY ALGORITHM
+
         //INITIALIZE
         //EVALUATE
         //REPEAT UNTIL TERMINATION CONDITION
-        // SELECT PARENTS
+        // SELECT PARENTS (entire population) select 5 randomly and weight using roulette algorithm (weighted random select). 3 highest for recomb, 2 lowest for mutat.
         // RECOMBINE
         // MUTATE
         // EVALUATE
         // SELECT FOR NEXT GEN
 
         Population germanPopulation = new Population();
-        for (int i = 0; i < Constants.CYCLES_SIZE; i++) {
+        for (int i = 0; i < 2;i++){//Constants.CYCLES_SIZE; i++) {
             printPopulationStats(germanPopulation);
 
             // Select parents
@@ -23,11 +25,11 @@ public class Evolution {
             // printIndividualsArray(bufferParents, "Parents");            
 
             // Create children
-            Individual[] bufferChildren = createChildrenFromParents(bufferParents);
+            //Individual[] bufferChildren = createChildrenFromParents(bufferParents);
             // printIndividualsArray(bufferChildren, "Children");            
 
             // Replace current worst individuals with the new children
-            germanPopulation.replaceWorstIndividuals(bufferChildren);
+            //germanPopulation.replaceWorstIndividuals(bufferChildren);
         }
     }
 

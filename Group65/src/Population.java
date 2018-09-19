@@ -74,9 +74,71 @@ public class Population {
 
     public Individual[] selectParents(){
         // Select PARENTS_SWAP_SIZE parents from the population randomly
-        Individual[] parents = new Individual[Constants.PARENTS_SWAP_SIZE];
+        Individual[] parents = new Individual[Constants.POPULATION_SIZE];
+        //create dummy values
+        for (int b = 0; b < parents.length; b++) {
+            parents[b] = new Individual(0);
+        }
         Individual[] currentPeople = this.getPeople();
+        calculateProbabilities();
+        //sort the people
+        for (int i = 0; i < currentPeople.length; i++) {
+            for (int j = 0; j < currentPeople.length; j++) {
+                if( currentPeople[i].getFitness() < currentPeople[j].getFitness()){
+                    Individual buffer = currentPeople[i];
+                    currentPeople[i] = currentPeople[j];
+                    currentPeople[j] = buffer;
+                }
+            }
+        }
+        double cumulativeProbs = 0;
+        for (int i = 0; i < currentPeople.length; i++) {
+            cumulativeProbs += this.getPeople()[i].getProbability();
+            System.out.println("People: " + currentPeople[i].getFitness());
+            //System.out.println("prob " + currentPeople[i].getProbability());
+        }
+        System.out.println("--");
+        //System.out.println("total fit " + this.overallFitness);
+        //System.out.println("total prob: "+cumulativeProbs);
 
+        //new roulette wheel algorithm
+        calculateProbabilities();
+        int currentMember = 0;
+        while (currentMember < Constants.PARENTS_SWAP_SIZE){
+            double r = Math.random();
+            int k = 0;
+            double cumulativeProb = this.getPeople()[k].getProbability();
+            while(cumulativeProb < r){
+                k++;
+                cumulativeProb += this.getPeople()[k].getProbability();
+            }
+            //check for doubles
+            boolean abort = false;
+            for (int a = 0; a < parents.length; a++) {
+                if(parents[a].getEncoding() == currentPeople[k].getEncoding() && parents[a].index == currentPeople[k].index){
+                    abort = true;
+                }
+            }
+            if(abort){
+                continue;
+            }
+            parents[currentMember] = currentPeople[k];
+            System.out.println("ParentR: " + parents[currentMember].getFitness());
+            currentMember++;
+        }
+        int newIndex = Constants.PARENTS_SWAP_SIZE;
+        for (int y = 0; y < currentPeople.length; y++) {
+            for (int q = 0; q < parents.length; q++) {
+                if(currentPeople[y].index == parents[q].index){
+                    break;
+                }
+            }
+            parents[newIndex] = currentPeople[y];
+            System.out.println("ParentM: " + parents[newIndex].getFitness());
+            newIndex++;
+        }
+
+        /*old naive algorithm (choose random parents)
         for (int j = 0; j < Constants.PARENTS_SWAP_SIZE; j++) {
             // NOTE: In this case one individual can be chosen twice as a parent
             Individual chosenParent = currentPeople[(int)(Math.random()*Constants.POPULATION_SIZE)];
@@ -85,7 +147,7 @@ public class Population {
             parents[j] = new Individual();
             parents[j].setEncoding(chosenParentEncoding);
         }
-
+        */
         return parents;
     }
 
@@ -101,9 +163,8 @@ public class Population {
 
     //Calculate and set the probability for each individual based on its fitness
     private void calculateProbabilities(){
-        double totalFitness = this.overallFitness;
         for (int i = 0; i < Constants.POPULATION_SIZE; i++){
-            this.people[i].setProbability(this.people[i].calculateFitness()/totalFitness);
+            this.people[i].setProbability(this.people[i].calculateFitness()/this.overallFitness);
         }
     }
 

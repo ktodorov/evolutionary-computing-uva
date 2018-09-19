@@ -7,16 +7,23 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Individual {
+    private static int z = 0;
     private int encoding;
     private int[] body;
 
+    public int index;
     private double fitness;
     private double probability;
 
+    public Individual(int dummy){
+        this.encoding = -1;
+    }
     public Individual() {
+        this.index = z++;
         this.encoding = (int)(Math.random()*31);
         this.body = MathHelper.makeBinary(this.encoding);
         this.fitness = calculateFitness();
+        this.probability = 0;
     }
 
     public Individual(Individual parent, MutationType mutationType){
@@ -73,7 +80,8 @@ public class Individual {
     }
 
     public double calculateFitness(){
-        return Math.abs(Math.sin((double)this.encoding));
+        //return Math.abs(Math.sin((double)this.encoding));
+        return (this.encoding*this.encoding);
     }
 
     public void setProbability(double x){
