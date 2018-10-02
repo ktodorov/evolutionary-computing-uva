@@ -73,6 +73,14 @@ public class Population {
     }
 
     public Individual[] selectParents(){
+        /*
+        General idea for selection of new generation:
+        Choose 60% of old generation for recombination using roulette. Apply mutation to 5% of them as well.
+        Choose 20% of the remaining old generation for mutation.
+        Choose the 20% strongest individuals of old generation without any modification.
+        Swap the whole generation!
+        */
+
         // Select PARENTS_SWAP_SIZE parents from the population randomly
         Individual[] parents = new Individual[Constants.POPULATION_SIZE];
         //create dummy values
