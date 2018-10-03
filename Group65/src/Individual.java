@@ -16,7 +16,7 @@ public class Individual {
     private double probability;
 
     public Individual(int dummy){
-        this.encoding = -1;
+        this.encoding = (dummy*0)-1;
     }
     public Individual() {
         this.index = z++;
@@ -26,6 +26,7 @@ public class Individual {
         this.probability = 0;
     }
 
+/* IS THIS NECESSARY?
     public Individual(Individual parent, MutationType mutationType){
         if (mutationType == null) {
             mutationType = MutationType.NONE;
@@ -33,7 +34,7 @@ public class Individual {
 
         mutate(parent.getBody(), mutationType);
     }
-
+*/
     public Individual(Individual firstParent, Individual secondParent){
         int[] firstParentBody = firstParent.getBody();
         int[] secondParentBody = secondParent.getBody();
@@ -53,12 +54,13 @@ public class Individual {
         this.setEncoding(MathHelper.makeDecimal(recombination));
     }
 
-    public void mutate(int[] bodyArray, MutationType mutationType){
-        int[] mutatedBody = MutationsHelper.mutateByType(bodyArray, mutationType);
+    public Individual mutate(MutationType mutationType){
+        int[] mutatedBody = MutationsHelper.mutateByType(this.body, mutationType);
         
         this.body = mutatedBody;
         this.encoding = MathHelper.makeDecimal(this.body);
         this.fitness = calculateFitness();
+        return this;
     }
 
     public void setEncoding(int x){

@@ -1,5 +1,6 @@
 package Helpers;
 
+import Mutations.DoubleMutation;
 import Mutations.MutationType;
 import Mutations.BinaryMutation;
 
@@ -12,10 +13,24 @@ public class MutationsHelper{
         switch (mutation){
             case BINARY:
                 return BinaryMutation.mutate(arrayToMutate);
-
             case NONE:
             default:
                 return arrayToMutate;
+        }
+    }
+
+    //NOT USED ATM
+    public static double mutateByType(double encoding, MutationType mutation){
+        if (encoding == 0 || mutation == null){
+            return encoding;
+        }
+
+        switch (mutation){
+            case DOUBLE:
+                return DoubleMutation.mutate(encoding);
+            case NONE:
+            default:
+                return encoding;
         }
     }
 }

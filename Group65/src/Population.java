@@ -1,8 +1,5 @@
-import Helpers.MathHelper;
 import Constants.Constants;
-import Mutations.MutationType;
 
-import java.util.List;
 import java.util.ArrayList;
 
 public class Population {
@@ -12,25 +9,75 @@ public class Population {
     public Population(){
         this.people = new Individual[Constants.POPULATION_SIZE];
         
-            // Initialize each individual
+        // Initialize each individual
         for (int i = 0; i < this.people.length; i++) {
             this.people[i] = new Individual();
         }
     }
 
+    //Note: No copies are added to the new population.
+    //Beware of Individual.setEncoding for changes in #starter
+    public Population(Individual[] starter){
+        this.people = new Individual[starter.length];
+
+        // Initialize each individual
+        for (int i = 0; i < starter.length; i++) {
+            this.people[i] = starter[i];
+        }
+    }
+
+    //Note: No copies are added to the new population.
+    //Beware of Individual.setEncoding for changes in #starter
+    public void addIndividualsToPop(Individual[] individualstoAdd){
+        if(this.people.length >= Constants.POPULATION_SIZE){
+            System.out.println("Population full. Abort");
+            return;
+        }
+        else{
+            int newSize = this.people.length+individualstoAdd.length;
+            Individual[] buffer = new Individual[newSize];
+
+            for (int i = 0; i < this.people.length; i++) {
+                buffer[i] = this.people[i];
+            }
+            for (int i = this.people.length; i < newSize; i++) {
+                buffer[i] = individualstoAdd[i-this.people.length];
+            }
+            this.people = buffer;
+        }
+    }
+
+    public void removeIndividualAtIndex(int index){
+        if(this.people.length <= 0){
+            System.out.println("Population empty. Abort");
+            return;
+        }
+        else{
+            int newSize = this.people.length-1;
+            Individual[] buffer = new Individual[newSize];
+            for (int i = 0; i < index; i++) {
+                buffer[i] = this.people[i];
+            }
+            for (int i = index+1; i < this.people.length; i++) {
+                buffer[i-1] = this.people[i];
+            }
+            this.people = buffer;
+        }
+    }
     public void print(){
         int k = 0;
 
         for (Individual i: this.people) {
             System.out.println("Fitness of individual "+(k++)+": "+i.getFitness());
         }
+        System.out.println("--");
     }
 
     public Individual[] getPeople(){
         return this.people;
     }
 
-    public double highestIndividualFitness(){
+    public double getHighestIndividualFitness(){
         double bestFitness = -1.0;
         for (int s = 0; s < this.people.length; s++) {
             if(this.people[s].getFitness() > bestFitness){
@@ -51,7 +98,7 @@ public class Population {
     }
 
     public void replaceWorstIndividuals(Individual[] children) {
-        List<Integer> indexesToSkip = new ArrayList<Integer>();
+        ArrayList<Integer> indexesToSkip = new ArrayList<Integer>();
 
         // SELECT children by 'highest fitness' for next generation.
         for (int t = 0; t < children.length; t++) {
@@ -72,111 +119,108 @@ public class Population {
         }
     }
 
+    //TODO create abstract SelectionType class for these differen classes? "random", "roulette wheel", "tournament"...?
     public Individual[] selectParents(){
-        /*
-        General idea for selection of new generation:
-        Choose 60% of old generation for recombination using roulette. Apply mutation to 5% of them as well.
-        Choose 20% of the remaining old generation for mutation.
-        Choose the 20% strongest individuals of old generation without any modification.
-        Swap the whole generation!
-        */
 
-        // Select PARENTS_SWAP_SIZE parents from the population randomly
+        //initialize new array for parents
         Individual[] parents = new Individual[Constants.POPULATION_SIZE];
-        //create dummy values
         for (int b = 0; b < parents.length; b++) {
+            //dummy values
             parents[b] = new Individual(0);
         }
-        Individual[] currentPeople = this.getPeople();
-        calculateProbabilities();
+
+        //is this necessary?
+        Population copy = this;//new Population(this.getPeople());
+        copy.calculateProbabilities();
+
         //sort the people
-        for (int i = 0; i < currentPeople.length; i++) {
-            for (int j = 0; j < currentPeople.length; j++) {
-                if( currentPeople[i].getFitness() < currentPeople[j].getFitness()){
-                    Individual buffer = currentPeople[i];
-                    currentPeople[i] = currentPeople[j];
-                    currentPeople[j] = buffer;
+        //TODO sort is inefficient O(n²)
+        for (int i = 0; i < copy.getPeople().length; i++) {
+            for (int j = 0; j < copy.getPeople().length; j++) {
+                if( copy.getPeople()[i].getFitness() < copy.getPeople()[j].getFitness()){
+                    Individual buffer = copy.getPeople()[i];
+                    copy.getPeople()[i] = copy.getPeople()[j];
+                    copy.getPeople()[j] = buffer;
                 }
             }
         }
-        double cumulativeProbs = 0;
-        for (int i = 0; i < currentPeople.length; i++) {
-            cumulativeProbs += this.getPeople()[i].getProbability();
-            System.out.println("People: " + currentPeople[i].getFitness());
-            //System.out.println("prob " + currentPeople[i].getProbability());
-        }
-        System.out.println("--");
-        //System.out.println("total fit " + this.overallFitness);
-        //System.out.println("total prob: "+cumulativeProbs);
-
-        //new roulette wheel algorithm
-        calculateProbabilities();
+        //roulette wheel algorithm for selection based on fitness probabilites
+        copy.calculateProbabilities();
         int currentMember = 0;
-        while (currentMember < Constants.PARENTS_SWAP_SIZE){
+        double removedProbabilities = 0;
+        while (currentMember < Constants.PARENTS_SIZE){
             double r = Math.random();
             int k = 0;
-            double cumulativeProb = this.getPeople()[k].getProbability();
+            double cumulativeProb = 0;
             while(cumulativeProb < r){
+                cumulativeProb += copy.getPeople()[k].getProbability();
                 k++;
-                cumulativeProb += this.getPeople()[k].getProbability();
             }
-            //check for doubles
-            boolean abort = false;
-            for (int a = 0; a < parents.length; a++) {
-                if(parents[a].getEncoding() == currentPeople[k].getEncoding() && parents[a].index == currentPeople[k].index){
-                    abort = true;
-                }
-            }
-            if(abort){
-                continue;
-            }
-            parents[currentMember] = currentPeople[k];
-            System.out.println("ParentR: " + parents[currentMember].getFitness());
+            k--;
+
+            //parent at position k was found and is added to final array
+            parents[currentMember] = copy.getPeople()[k];
+
+            //prevent choosing Individuals twice
+            removedProbabilities += copy.getPeople()[k].getProbability();
+            copy.removeIndividualAtIndex(k);
+            copy.calculateProbabilities();
             currentMember++;
         }
-        int newIndex = Constants.PARENTS_SWAP_SIZE;
-        for (int y = 0; y < currentPeople.length; y++) {
-            for (int q = 0; q < parents.length; q++) {
-                if(currentPeople[y].index == parents[q].index){
-                    break;
-                }
-            }
-            parents[newIndex] = currentPeople[y];
-            System.out.println("ParentM: " + parents[newIndex].getFitness());
-            newIndex++;
-        }
-
-        /*old naive algorithm (choose random parents)
-        for (int j = 0; j < Constants.PARENTS_SWAP_SIZE; j++) {
-            // NOTE: In this case one individual can be chosen twice as a parent
-            Individual chosenParent = currentPeople[(int)(Math.random()*Constants.POPULATION_SIZE)];
-            int chosenParentEncoding = chosenParent.getEncoding();
-
-            parents[j] = new Individual();
-            parents[j].setEncoding(chosenParentEncoding);
-        }
-        */
         return parents;
     }
 
+    public Individual[] selectToMutate(){
+        Individual[] selection = new Individual[Constants.MUTATION_SIZE];
+        for (int k = 0; k < selection.length; k++) {
+            selection[k] = this.getPeople()[(int)(Math.random()*this.getPeople().length)];
+        }
+        return selection;
+    }
+    //For direct selection into new generation, just pick x fittest people from previous!
+    public Individual[] selectFittest(int x_Fittest_People){
+        Individual[] fittest = new Individual[x_Fittest_People];
+        Population buffer = new Population(this.getPeople());
+
+        //choose the x fittest people
+        for (int i = 0; i < x_Fittest_People; i++) {
+            double maxFitness = -1;
+            int indexOfFittest = -1;
+            Individual candidate = new Individual(0);
+
+            //find fittest of generation
+            for (int j = 0; j < buffer.getPeople().length; j++) {
+                if(buffer.getPeople()[j].getFitness() > maxFitness){
+                    candidate = buffer.getPeople()[j];
+                    maxFitness = candidate.getFitness();
+                    indexOfFittest = j;
+                }
+            }
+            buffer.removeIndividualAtIndex(indexOfFittest);
+            fittest[i] = candidate;
+        }
+        return fittest;
+    }
+
     //Calculate the sum over all individuals' fitness
-    private void calculateOverallFitness(){
+    private double calculateOverallFitness(){
         double result = 0;
         for (int i = 0; i < this.people.length; i++){
             result += people[i].getFitness();
         }
 
         this.overallFitness = result;
+        return this.overallFitness;
     }
 
     //Calculate and set the probability for each individual based on its fitness
     private void calculateProbabilities(){
-        for (int i = 0; i < Constants.POPULATION_SIZE; i++){
-            this.people[i].setProbability(this.people[i].calculateFitness()/this.overallFitness);
+        for (int i = 0; i < this.getPeople().length; i++){
+            this.getPeople()[i].setProbability(this.getPeople()[i].calculateFitness()/this.calculateOverallFitness());
         }
     }
 
-    private static int getIndexOfWorstIndividual(Individual[] individuals, List<Integer> indexesToSkip) {
+    private static int getIndexOfWorstIndividual(Individual[] individuals, ArrayList<Integer> indexesToSkip) {
         if (individuals == null || individuals.length <= 1){
             return 0;
         }

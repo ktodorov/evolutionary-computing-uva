@@ -1,41 +1,44 @@
-import Helpers.MathHelper;
-import java.util.Collections;
 import Constants.Constants;
+import Mutations.MutationType;
 
 public class Evolution {
     public static void startEvolutionaryAlgorithm(){
+        /*
+        General idea for selection of new generation:
+        Choose 60% of old generation for recombination using roulette. Apply mutation to 5% of them as well.
+        Choose 20% of the remaining old generation for mutation.
+        Choose the 20% strongest individuals of old generation without any modification.
+        = new generation!
+        */
+        Population tribe = new Population();
+        tribe.print();
+        printPopulationStats(tribe);
+        System.out.println("--magic--");
+        for (int i = 0; i < Constants.CYCLES_SIZE; i++) {
+            Population nextGeneration = new Population(tribe.selectFittest(Constants.FITTEST_SIZE));
 
-        //PSEUDOCODE EVOLUTIONARY ALGORITHM
+            // PARENT SELECTION
+            Individual[] parents = tribe.selectParents();
 
-        //INITIALIZE
-        //EVALUATE
-        //REPEAT UNTIL TERMINATION CONDITION
-        // SELECT PARENTS (entire population) select 5 randomly and weight using roulette algorithm (weighted random select). 3 highest for recomb, 2 lowest for mutat.
-        // RECOMBINE
-        // MUTATE
-        // EVALUATE
-        // SELECT FOR NEXT GEN
+            // RECOMBINATION
+            nextGeneration.addIndividualsToPop(recombine(parents));
 
-        Population germanPopulation = new Population();
-        for (int i = 0; i < 2;i++){//Constants.CYCLES_SIZE; i++) {
-            printPopulationStats(germanPopulation);
+            // MUTATION
+            Individual[] toBeMutated = tribe.selectToMutate(); // currently random select from remaining population
+            nextGeneration.addIndividualsToPop(mutate(toBeMutated, MutationType.BINARY));
 
-            // Select parents
-            Individual[] bufferParents = germanPopulation.selectParents();
-            // printIndividualsArray(bufferParents, "Parents");            
-
-            // Create children
-            //Individual[] bufferChildren = createChildrenFromParents(bufferParents);
-            // printIndividualsArray(bufferChildren, "Children");            
-
-            // Replace current worst individuals with the new children
-            //germanPopulation.replaceWorstIndividuals(bufferChildren);
+            // SURVIVOR SELECTION
+            // implicitly done via the Population.nextGeneration
+            tribe = nextGeneration;
         }
+        printPopulationStats(tribe);
+        System.out.println("--");
+        tribe.print();
     }
 
     public static void printPopulationStats(Population population) {
         System.out.println("Overall population fitness: " + population.getOverallFitness());
-        System.out.println("Highest individual fitness: " + population.highestIndividualFitness());
+        System.out.println("Highest individual fitness: " + population.getHighestIndividualFitness());
     }
 
     private static void printIndividualsArray(Individual[] individuals, String header){
@@ -47,18 +50,20 @@ public class Evolution {
         }
     }
 
-    private static Individual[] createChildrenFromParents(Individual[] parents) {
-        // Recombine first n - 1 children out of n parents
-        Individual[] children = new Individual[Constants.PARENTS_SWAP_SIZE];
-        for (int k = 0; k < Constants.PARENTS_SWAP_SIZE - 1; k++) {
+    private static Individual[] mutate(Individual[] tribe, MutationType type){
+        for (int k = 0; k < tribe.length; k++) {
+            tribe[k].mutate(type);
+        }
+        return tribe;
+    }
+
+    private static Individual[] recombine(Individual[] parents) {
+        //TODO which parents mate with each other? Currently neighborhood relation!
+        Individual[] children = new Individual[Constants.PARENTS_SIZE];
+        for (int k = 0; k < Constants.PARENTS_SIZE - 1; k++) {
             children[k] = new Individual(parents[k], parents[k+1]);
         }
-
-        // Mutate last child by mutating last parent
-        // TODO: combine binary/decimal conversion in mutate method?
-        Individual lastParent = parents[Constants.PARENTS_SWAP_SIZE - 1];
-        children[Constants.PARENTS_SWAP_SIZE - 1] = new Individual(lastParent, Constants.DEFAULT_MUTATION_TYPE);
-
+        children[Constants.PARENTS_SIZE-1] = new Individual(parents[0], parents[Constants.PARENTS_SIZE-1]);
         return children;
     }
 }
