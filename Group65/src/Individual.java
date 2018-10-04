@@ -2,14 +2,13 @@ import Helpers.MathHelper;
 import Helpers.MutationsHelper;
 import Mutations.MutationType;
 import Constants.Constants;
-
-import java.util.List;
-import java.util.ArrayList;
+import jdk.nashorn.api.tree.ParenthesizedTree;
 
 public class Individual {
     private static int z = 0;
-    private int encoding;
-    private int[] body;
+    private double encoding;
+    private double phenotypeDouble;
+    private int[] phenotypeBinary;
 
     public int index;
     private double fitness;
@@ -20,8 +19,9 @@ public class Individual {
     }
     public Individual() {
         this.index = z++;
-        this.encoding = (int)(Math.random()*31);
-        this.body = MathHelper.makeBinary(this.encoding);
+        this.encoding = Math.random()*31;
+        this.phenotypeDouble = this.encoding;
+        this.phenotypeBinary = MathHelper.makeBinary((int)this.encoding);
         this.fitness = calculateFitness();
         this.probability = 0;
     }
@@ -32,49 +32,62 @@ public class Individual {
             mutationType = MutationType.NONE;
         }        
 
-        mutate(parent.getBody(), mutationType);
+        mutateBinary(parent.getPhenotypeBinary(), mutationType);
     }
 */
-    public Individual(Individual firstParent, Individual secondParent){
-        int[] firstParentBody = firstParent.getBody();
-        int[] secondParentBody = secondParent.getBody();
-        int[] recombination = new int[Constants.BINARY_REPRESENTATION_LENGTH];
+    public Individual(Individual firstParent, Individual secondParent, MutationType type){
+        if(type == MutationType.BINARY){
+            int[] firstParentBody = firstParent.getPhenotypeBinary();
+            int[] secondParentBody = secondParent.getPhenotypeBinary();
+            int[] recombination = new int[Constants.BINARY_REPRESENTATION_LENGTH];
 
-        // cutoff between 1 and (the whole length - 1) to avoid swapping individuals entirely
-        int cutoff = (int)(Math.random() * (Constants.BINARY_REPRESENTATION_LENGTH - 1)) + 1;
+            // cutoff between 1 and (the whole length - 1) to avoid swapping individuals entirely
+            int cutoff = (int)(Math.random() * (Constants.BINARY_REPRESENTATION_LENGTH - 1)) + 1;
 
-        for (int m = 0; m < Constants.BINARY_REPRESENTATION_LENGTH - cutoff; m++){
-            recombination[m] = firstParentBody[m];
+            for (int m = 0; m < Constants.BINARY_REPRESENTATION_LENGTH - cutoff; m++){
+                recombination[m] = firstParentBody[m];
+            }
+
+            for (int n = Constants.BINARY_REPRESENTATION_LENGTH - cutoff; n < Constants.BINARY_REPRESENTATION_LENGTH; n++){
+                recombination[n] = secondParentBody[n];
+            }
+
+            this.setEncoding(MathHelper.makeDecimal(recombination));
         }
-
-        for (int n = Constants.BINARY_REPRESENTATION_LENGTH - cutoff; n < Constants.BINARY_REPRESENTATION_LENGTH; n++){
-            recombination[n] = secondParentBody[n];
+        else if(type == MutationType.DOUBLE){
+            //average between two parents by random probabilities x and 1-x.
+            double p_x = Math.random();
+            double p_y = 1-p_x;
+            this.setEncoding(p_x*firstParent.getEncoding()+p_y*secondParent.getEncoding());
         }
-
-        this.setEncoding(MathHelper.makeDecimal(recombination));
     }
 
-    public Individual mutate(MutationType mutationType){
-        int[] mutatedBody = MutationsHelper.mutateByType(this.body, mutationType);
-        
-        this.body = mutatedBody;
-        this.encoding = MathHelper.makeDecimal(this.body);
+    public Individual mutateBinary(MutationType mutationType){
+        this.phenotypeBinary = MutationsHelper.mutateByType(this.phenotypeBinary, mutationType);
+        this.encoding = MathHelper.makeDecimal(this.phenotypeBinary);
+        this.fitness = calculateFitness();
+        return this;
+    }
+    public Individual mutateDouble(MutationType mutationType){
+        this.phenotypeDouble = MutationsHelper.mutateByType(this.phenotypeDouble, MutationType.DOUBLE);
+        this.encoding = this.phenotypeDouble;
         this.fitness = calculateFitness();
         return this;
     }
 
-    public void setEncoding(int x){
+    public void setEncoding(double x){
         this.encoding = x;
-        this.body = MathHelper.makeBinary(this.encoding);
+        this.phenotypeDouble = x;
+        this.phenotypeBinary = MathHelper.makeBinary((int)this.encoding);
         this.fitness = calculateFitness();
     }
 
-    public int getEncoding(){
+    public double getEncoding(){
         return this.encoding;
     }
 
-    public int[] getBody(){
-        return this.body;
+    public int[] getPhenotypeBinary(){
+        return this.phenotypeBinary;
     }
 
     public Double getFitness(){
@@ -97,7 +110,7 @@ public class Individual {
     public void print(){
         System.out.println(
             "Encoding: "+ this.encoding + 
-            ", Decoding: " + MathHelper.getBinaryString(this.body) + 
+            ", Decoding: " + MathHelper.getBinaryString(this.phenotypeBinary) +
             ", Fitness: " + this.fitness);
     }
 }

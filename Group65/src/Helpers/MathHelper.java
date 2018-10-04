@@ -6,7 +6,13 @@ public class MathHelper {
     
     // Turns the input value x into a binary String of length "binaryLength"
     public static int[] makeBinary(int intNumber){
-        int binaryLength = getIntBinaryLength(intNumber);
+        if(intNumber > 31){
+            //This should only be an issue when using Double Recombination.
+            intNumber = 31;
+            //System.out.println("Binary too large!");
+        }
+        //produced issues when binarylength != Constants.BINARY_REPRESENTATION_LENGTH
+        //int binaryLength = getIntBinaryLength(intNumber);
 
         // Initialize the array with zeros only
         int[] output = new int[Constants.BINARY_REPRESENTATION_LENGTH];
@@ -15,7 +21,7 @@ public class MathHelper {
         }
 
         // Calculate the binary value
-        for (int i = binaryLength - 1; i >= 0; i--){
+        for (int i = Constants.BINARY_REPRESENTATION_LENGTH - 1; i >= 0; i--){
             output[i] = intNumber % 2;
             intNumber = intNumber/2;
         }

@@ -119,7 +119,8 @@ public class Population {
         }
     }
 
-    //TODO create abstract SelectionType class for these differen classes? "random", "roulette wheel", "tournament"...?
+    //TODO create abstract SelectionType class for different classes? "random", "roulette wheel", "tournament"...?
+    //This method returns the parents using the roulette wheel algorithm while removing them from the Population it is called on.
     public Individual[] selectParents(){
 
         //initialize new array for parents
@@ -169,7 +170,7 @@ public class Population {
         }
         return parents;
     }
-
+    //This method returns randomly selected parents for mutation from the remaining population, while removing them from the Population it is called on.
     public Individual[] selectToMutate(){
         Individual[] selection = new Individual[Constants.MUTATION_SIZE];
         for (int k = 0; k < selection.length; k++) {
@@ -178,12 +179,12 @@ public class Population {
         return selection;
     }
     //For direct selection into new generation, just pick x fittest people from previous!
-    public Individual[] selectFittest(int x_Fittest_People){
-        Individual[] fittest = new Individual[x_Fittest_People];
+    public Individual[] selectFittest(){
+        Individual[] fittest = new Individual[Constants.FITTEST_SIZE];
         Population buffer = new Population(this.getPeople());
 
         //choose the x fittest people
-        for (int i = 0; i < x_Fittest_People; i++) {
+        for (int i = 0; i < Constants.FITTEST_SIZE; i++) {
             double maxFitness = -1;
             int indexOfFittest = -1;
             Individual candidate = new Individual(0);
