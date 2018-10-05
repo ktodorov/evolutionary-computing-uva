@@ -1,12 +1,14 @@
 import Constants.Constants;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class Population {
     private Individual[] people;
     private double overallFitness;
 
-    public Population(){
+    Population(){
         this.people = new Individual[Constants.POPULATION_SIZE];
         
         // Initialize each individual
@@ -15,56 +17,42 @@ public class Population {
         }
     }
 
-    //Note: No copies are added to the new population.
+    //Note: Not sure if actual copies are added to the new population or just references
     //Beware of Individual.setEncoding for changes in #starter
-    public Population(Individual[] starter){
+    Population(Individual[] starter){
         this.people = new Individual[starter.length];
-
-        // Initialize each individual
-        for (int i = 0; i < starter.length; i++) {
-            this.people[i] = starter[i];
-        }
+        System.arraycopy(starter, 0, this.people, 0, starter.length);
     }
 
     //Note: No copies are added to the new population.
     //Beware of Individual.setEncoding for changes in #starter
-    public void addIndividualsToPop(Individual[] individualstoAdd){
+    void addIndividualsToPop(Individual[] individualsToAdd){
         if(this.people.length >= Constants.POPULATION_SIZE){
             System.out.println("Population full. Abort");
-            return;
         }
         else{
-            int newSize = this.people.length+individualstoAdd.length;
+            int newSize = this.people.length+individualsToAdd.length;
             Individual[] buffer = new Individual[newSize];
 
-            for (int i = 0; i < this.people.length; i++) {
-                buffer[i] = this.people[i];
-            }
-            for (int i = this.people.length; i < newSize; i++) {
-                buffer[i] = individualstoAdd[i-this.people.length];
-            }
+            System.arraycopy(this.people, 0, buffer, 0, this.people.length);
+            System.arraycopy(individualsToAdd, 0, buffer, this.people.length, newSize-this.people.length);
             this.people = buffer;
         }
     }
 
-    public void removeIndividualAtIndex(int index){
+    private void removeIndividualAtIndex(int index){
         if(this.people.length <= 0){
             System.out.println("Population empty. Abort");
-            return;
         }
         else{
             int newSize = this.people.length-1;
             Individual[] buffer = new Individual[newSize];
-            for (int i = 0; i < index; i++) {
-                buffer[i] = this.people[i];
-            }
-            for (int i = index+1; i < this.people.length; i++) {
-                buffer[i-1] = this.people[i];
-            }
+            System.arraycopy(this.people, 0, buffer, 0, index);
+            System.arraycopy(this.people, index+1, buffer, index, this.people.length-index-1);
             this.people = buffer;
         }
     }
-    public void print(){
+    void print(){
         int k = 0;
 
         for (Individual i: this.people) {
@@ -73,55 +61,33 @@ public class Population {
         System.out.println("--");
     }
 
-    public Individual[] getPeople(){
+    private Individual[] getPeople(){
         return this.people;
     }
 
-    public double getHighestIndividualFitness(){
+    double getHighestIndividualFitness(){
         double bestFitness = -1.0;
-        for (int s = 0; s < this.people.length; s++) {
-            if(this.people[s].getFitness() > bestFitness){
-                bestFitness = this.people[s].getFitness();
+        for (Individual individual : this.people) {
+            if(individual.getFitness() > bestFitness){
+                bestFitness = individual.getFitness();
             }
         }
-
         return bestFitness;
     }
 
-    public double getOverallFitness(){
+    double getOverallFitness(){
         this.calculateOverallFitness();
         return this.overallFitness;
     }
 
-    public void replaceIndividual(int index, Individual individual){
+    private void replaceIndividual(int index, Individual individual){
         this.people[index].setEncoding(individual.getEncoding());
     }
 
-    public void replaceWorstIndividuals(Individual[] children) {
-        ArrayList<Integer> indexesToSkip = new ArrayList<Integer>();
-
-        // SELECT children by 'highest fitness' for next generation.
-        for (int t = 0; t < children.length; t++) {
-            Individual[] individuals = this.getPeople();
-            if (individuals == null) {
-                break;
-            }
-
-            int indexOfWorst = getIndexOfWorstIndividual(individuals, indexesToSkip);
-            
-            // If we already replaced this parent, we don't want to replace it again during this cycle
-            indexesToSkip.add(indexOfWorst);
-
-            // TODO: Should we make a check before replacing or we absolutely have to replace?
-            if(children[t].getFitness() > individuals[indexOfWorst].getFitness()){
-                this.replaceIndividual(indexOfWorst, children[t]);
-            }
-        }
-    }
-
     //TODO create abstract SelectionType class for different classes? "random", "roulette wheel", "tournament"...?
-    //This method returns the parents using the roulette wheel algorithm while removing them from the Population it is called on.
-    public Individual[] selectParents(){
+    //This method returns the parents using the roulette wheel algorithm,
+    //while removing them from the Population it is called on.
+    Individual[] selectRouletteWheel(){
 
         //initialize new array for parents
         Individual[] parents = new Individual[Constants.POPULATION_SIZE];
@@ -130,25 +96,16 @@ public class Population {
             parents[b] = new Individual(0);
         }
 
-        //is this necessary?
+        //is this necessary? Do we need a copy?
         Population copy = this;//new Population(this.getPeople());
         copy.calculateProbabilities();
 
         //sort the people
-        //TODO sort is inefficient O(n²)
-        for (int i = 0; i < copy.getPeople().length; i++) {
-            for (int j = 0; j < copy.getPeople().length; j++) {
-                if( copy.getPeople()[i].getFitness() < copy.getPeople()[j].getFitness()){
-                    Individual buffer = copy.getPeople()[i];
-                    copy.getPeople()[i] = copy.getPeople()[j];
-                    copy.getPeople()[j] = buffer;
-                }
-            }
-        }
+        sortIndividuals(copy.getPeople());
+
         //roulette wheel algorithm for selection based on fitness probabilites
         copy.calculateProbabilities();
         int currentMember = 0;
-        double removedProbabilities = 0;
         while (currentMember < Constants.PARENTS_SIZE){
             double r = Math.random();
             int k = 0;
@@ -163,23 +120,22 @@ public class Population {
             parents[currentMember] = copy.getPeople()[k];
 
             //prevent choosing Individuals twice
-            removedProbabilities += copy.getPeople()[k].getProbability();
             copy.removeIndividualAtIndex(k);
             copy.calculateProbabilities();
             currentMember++;
         }
         return parents;
     }
-    //This method returns randomly selected parents for mutation from the remaining population, while removing them from the Population it is called on.
-    public Individual[] selectToMutate(){
-        Individual[] selection = new Individual[Constants.MUTATION_SIZE];
+    //This method returns randomly selected parents from the remaining population,
+    Individual[] selectRandom(int amount){
+        Individual[] selection = new Individual[amount];
         for (int k = 0; k < selection.length; k++) {
             selection[k] = this.getPeople()[(int)(Math.random()*this.getPeople().length)];
         }
         return selection;
     }
-    //For direct selection into new generation, just pick x fittest people from previous!
-    public Individual[] selectFittest(){
+    //For direct selection into new generation, we pick x fittest people from previous!
+    Individual[] selectFittest(){
         Individual[] fittest = new Individual[Constants.FITTEST_SIZE];
         Population buffer = new Population(this.getPeople());
 
@@ -203,13 +159,12 @@ public class Population {
         return fittest;
     }
 
-    //Calculate the sum over all individuals' fitness
+    //Calculate the sum over all individuals' fitnesses
     private double calculateOverallFitness(){
         double result = 0;
-        for (int i = 0; i < this.people.length; i++){
-            result += people[i].getFitness();
+        for (Individual individual : this.people) {
+            result += individual.getFitness();
         }
-
         this.overallFitness = result;
         return this.overallFitness;
     }
@@ -219,6 +174,11 @@ public class Population {
         for (int i = 0; i < this.getPeople().length; i++){
             this.getPeople()[i].setProbability(this.getPeople()[i].calculateFitness()/this.calculateOverallFitness());
         }
+    }
+
+    private void sortIndividuals(Individual[] individuals){
+        Arrays.sort(individuals, Comparator.comparingDouble(Individual::getFitness).reversed());
+
     }
 
     private static int getIndexOfWorstIndividual(Individual[] individuals, ArrayList<Integer> indexesToSkip) {
@@ -238,5 +198,26 @@ public class Population {
         }
 
         return indexOfWorst;
+    }
+    public void replaceWorstIndividuals(Individual[] children) {
+        ArrayList<Integer> indexesToSkip = new ArrayList<Integer>();
+
+        // SELECT children by 'highest fitness' for next generation.
+        for (int t = 0; t < children.length; t++) {
+            Individual[] individuals = this.getPeople();
+            if (individuals == null) {
+                break;
+            }
+
+            int indexOfWorst = getIndexOfWorstIndividual(individuals, indexesToSkip);
+
+            // If we already replaced this parent, we don't want to replace it again during this cycle
+            indexesToSkip.add(indexOfWorst);
+
+            // TODO: Should we make a check before replacing or we absolutely have to replace?
+            if(children[t].getFitness() > individuals[indexOfWorst].getFitness()){
+                this.replaceIndividual(indexOfWorst, children[t]);
+            }
+        }
     }
 }

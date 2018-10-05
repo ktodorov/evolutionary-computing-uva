@@ -2,9 +2,8 @@ import Helpers.MathHelper;
 import Helpers.MutationsHelper;
 import Mutations.MutationType;
 import Constants.Constants;
-import jdk.nashorn.api.tree.ParenthesizedTree;
 
-public class Individual {
+class Individual {
     private static int z = 0;
     private double encoding;
     private double phenotypeDouble;
@@ -14,10 +13,10 @@ public class Individual {
     private double fitness;
     private double probability;
 
-    public Individual(int dummy){
+    Individual(int dummy){
         this.encoding = (dummy*0)-1;
     }
-    public Individual() {
+    Individual() {
         this.index = z++;
         this.encoding = Math.random()*31;
         this.phenotypeDouble = this.encoding;
@@ -35,7 +34,8 @@ public class Individual {
         mutateBinary(parent.getPhenotypeBinary(), mutationType);
     }
 */
-    public Individual(Individual firstParent, Individual secondParent, MutationType type){
+    //TODO Currently MutationType is used for determining recombination type!
+    Individual(Individual firstParent, Individual secondParent, MutationType type){
         if(type == MutationType.BINARY){
             int[] firstParentBody = firstParent.getPhenotypeBinary();
             int[] secondParentBody = secondParent.getPhenotypeBinary();
@@ -43,15 +43,8 @@ public class Individual {
 
             // cutoff between 1 and (the whole length - 1) to avoid swapping individuals entirely
             int cutoff = (int)(Math.random() * (Constants.BINARY_REPRESENTATION_LENGTH - 1)) + 1;
-
-            for (int m = 0; m < Constants.BINARY_REPRESENTATION_LENGTH - cutoff; m++){
-                recombination[m] = firstParentBody[m];
-            }
-
-            for (int n = Constants.BINARY_REPRESENTATION_LENGTH - cutoff; n < Constants.BINARY_REPRESENTATION_LENGTH; n++){
-                recombination[n] = secondParentBody[n];
-            }
-
+            System.arraycopy(firstParentBody, 0, recombination, 0, Constants.BINARY_REPRESENTATION_LENGTH - cutoff);
+            System.arraycopy(secondParentBody, Constants.BINARY_REPRESENTATION_LENGTH - cutoff, recombination, Constants.BINARY_REPRESENTATION_LENGTH - cutoff, cutoff);
             this.setEncoding(MathHelper.makeDecimal(recombination));
         }
         else if(type == MutationType.DOUBLE){
@@ -62,52 +55,50 @@ public class Individual {
         }
     }
 
-    public Individual mutateBinary(MutationType mutationType){
+    void mutateBinary(MutationType mutationType){
         this.phenotypeBinary = MutationsHelper.mutateByType(this.phenotypeBinary, mutationType);
         this.encoding = MathHelper.makeDecimal(this.phenotypeBinary);
         this.fitness = calculateFitness();
-        return this;
     }
-    public Individual mutateDouble(MutationType mutationType){
-        this.phenotypeDouble = MutationsHelper.mutateByType(this.phenotypeDouble, MutationType.DOUBLE);
+    void mutateDouble(MutationType mutationType){
+        this.phenotypeDouble = MutationsHelper.mutateByType(this.phenotypeDouble, mutationType);
         this.encoding = this.phenotypeDouble;
         this.fitness = calculateFitness();
-        return this;
     }
 
-    public void setEncoding(double x){
+    void setEncoding(double x){
         this.encoding = x;
         this.phenotypeDouble = x;
         this.phenotypeBinary = MathHelper.makeBinary((int)this.encoding);
         this.fitness = calculateFitness();
     }
 
-    public double getEncoding(){
+    double getEncoding(){
         return this.encoding;
     }
 
-    public int[] getPhenotypeBinary(){
+    private int[] getPhenotypeBinary(){
         return this.phenotypeBinary;
     }
 
-    public Double getFitness(){
+    Double getFitness(){
         return this.fitness;
     }
 
-    public double calculateFitness(){
+    double calculateFitness(){
         //return Math.abs(Math.sin((double)this.encoding));
         return (this.encoding*this.encoding);
     }
 
-    public void setProbability(double x){
+    void setProbability(double x){
         this.probability = x;
     }
 
-    public double getProbability(){
+    double getProbability(){
         return this.probability;
     }
 
-    public void print(){
+    void print(){
         System.out.println(
             "Encoding: "+ this.encoding + 
             ", Decoding: " + MathHelper.getBinaryString(this.phenotypeBinary) +

@@ -1,8 +1,7 @@
 import Constants.Constants;
 import Mutations.MutationType;
-
-public class Evolution {
-    public static void startEvolutionaryAlgorithm(){
+class Evolution {
+    static void startEvolutionaryAlgorithm(){
         /*
         General idea for selection of new generation:
         Choose 60% of old generation for recombination using roulette. Apply mutation to 5% of them as well.
@@ -19,13 +18,13 @@ public class Evolution {
             Population nextGeneration = new Population(tribe.selectFittest());
 
             // PARENT SELECTION
-            Individual[] parents = tribe.selectParents();
+            Individual[] parents = tribe.selectRouletteWheel();
 
             // RECOMBINATION
             nextGeneration.addIndividualsToPop(recombine(parents, Constants.DEFAULT_MUTATION_TYPE));
 
             // MUTATION
-            Individual[] toBeMutated = tribe.selectToMutate(); // currently random select from remaining population
+            Individual[] toBeMutated = tribe.selectRandom(Constants.MUTATION_SIZE); // currently random select from remaining population
             nextGeneration.addIndividualsToPop(mutate(toBeMutated, Constants.DEFAULT_MUTATION_TYPE));
 
             // SURVIVOR SELECTION
@@ -37,10 +36,11 @@ public class Evolution {
         tribe.print();
     }
 
-    public static void printPopulationStats(Population population) {
+    private static void printPopulationStats(Population population) {
         System.out.println("Overall population fitness: " + population.getOverallFitness());
         System.out.println("Highest individual fitness: " + population.getHighestIndividualFitness());
     }
+
 
     private static void printIndividualsArray(Individual[] individuals, String header){
         System.out.println(header + ":");
@@ -52,12 +52,11 @@ public class Evolution {
     }
 
     private static Individual[] mutate(Individual[] tribe, MutationType type){
-        for (int k = 0; k < tribe.length; k++) {
-            if(type == MutationType.BINARY) {
-                tribe[k].mutateBinary(type);
-            }
-            else if(type == MutationType.DOUBLE){
-                tribe[k].mutateDouble(type);
+        for (Individual individual : tribe) {
+            if (type == MutationType.BINARY) {
+                individual.mutateBinary(type);
+            } else if (type == MutationType.DOUBLE) {
+                individual.mutateDouble(type);
             }
         }
         return tribe;

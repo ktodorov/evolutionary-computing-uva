@@ -42,8 +42,8 @@ public class MathHelper {
     // Prints a binary to the console for testing purposes
     public static String getBinaryString(int[] x){
         String result = "";
-        for (int i = 0; i < x.length; i++){
-            result += x[i];
+        for (int i : x) {
+            result += i;
         }
 
         return result;
