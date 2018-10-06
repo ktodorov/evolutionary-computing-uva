@@ -1,4 +1,4 @@
-package Mutations;
+package Enums;
 
 public enum MutationType{ 
     NONE,

@@ -1,7 +1,7 @@
 package Helpers;
 
+import Enums.MutationType;
 import Mutations.DoubleMutation;
-import Mutations.MutationType;
 import Mutations.BinaryMutation;
 
 public class MutationsHelper{
@@ -19,7 +19,6 @@ public class MutationsHelper{
         }
     }
 
-    //NOT USED ATM
     public static double mutateByType(double encoding, MutationType mutation){
         if (encoding == 0 || mutation == null){
             return encoding;
