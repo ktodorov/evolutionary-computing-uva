@@ -24,19 +24,34 @@ class Evolution {
         System.out.println("_,.-'love is in the air'-.,_");
 
         for (int i = 0; i < Constants.CYCLES_SIZE; i++) {
-            BaseIndividual[] fittestIndividuals = tribe.getTopIndividuals(Constants.FITTEST_SIZE);
+            int fittestSize = Constants.FITTEST_SIZE;
+            int recombinationSize = Constants.RECOMBINATION_SIZE;
+            int mutationSize = Constants.MUTATION_SIZE;
+
+            // If we reach the last LAST_CYCLES_WITHOUT_MUTATION cycles, 
+            // we must stop mutating in order to preserve the currently found good population
+            if (Constants.CYCLES_SIZE - i < Constants.LAST_CYCLES_WITHOUT_MUTATION) {
+                fittestSize += Constants.MUTATION_SIZE;
+                mutationSize = 0;
+            }
+
+            BaseIndividual[] fittestIndividuals = tribe.getTopIndividuals(fittestSize);
             Population nextGeneration = new Population(
                 Constants.CURRENT_MUTATION_TYPE,
                 Constants.CURRENT_PARENT_SELECTION_TYPE,
                 fittestIndividuals);
 
             // RECOMBINATION
-            BaseIndividual[] newChildren = tribe.createNewChildren();
-            nextGeneration.addIndividuals(newChildren);
+            if (recombinationSize > 0) {
+                BaseIndividual[] newChildren = tribe.createNewChildren(recombinationSize);
+                nextGeneration.addIndividuals(newChildren);
+            }
 
             // MUTATION
-            BaseIndividual[] mutatedChildren = tribe.mutateIndividuals(Constants.MUTATION_SIZE);
-            nextGeneration.addIndividuals(mutatedChildren);
+            if (mutationSize > 0) {
+                BaseIndividual[] mutatedChildren = tribe.mutateIndividuals(Constants.MUTATION_SIZE);
+                nextGeneration.addIndividuals(mutatedChildren);
+            }
 
             // SURVIVOR SELECTION
             // implicitly done via the Population.nextGeneration

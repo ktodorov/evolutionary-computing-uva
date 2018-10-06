@@ -66,8 +66,8 @@ public class Population {
         return fittest;
     }
 
-    public BaseIndividual[] createNewChildren() {
-        BaseIndividual[] parents = this.selectParents();
+    public BaseIndividual[] createNewChildren(int count) {
+        BaseIndividual[] parents = this.selectParents(count);
         BaseIndividual[] newChildren = recombine(parents);
         return newChildren;
     }
@@ -163,12 +163,12 @@ public class Population {
         return parents;
     }
 
-    private BaseIndividual[] selectParents() {
+    private BaseIndividual[] selectParents(int count) {
         switch (this.parentSelectionType){
             case RANDOM:
-                return getRandomIndividuals(Constants.PARENTS_SIZE);
+                return getRandomIndividuals(count);
             case ROULETTE_WHEEL:
-                return selectParentsByRouletteWheel(Constants.PARENTS_SIZE);
+                return selectParentsByRouletteWheel(count);
         }
 
         return null;
@@ -178,12 +178,12 @@ public class Population {
         // TODO which parents mate with each other? Currently neighborhood relation!
 
         // 1 with 2, 2 with 3, 3 with 4, ..., n with 1. (Circular!)
-        BaseIndividual[] children = new BaseIndividual[Constants.PARENTS_SIZE];
-        for (int k = 0; k < Constants.PARENTS_SIZE - 1; k++) {
+        BaseIndividual[] children = new BaseIndividual[parents.length];
+        for (int k = 0; k < parents.length - 1; k++) {
             children[k] = BaseIndividual.createFromParents(parents[k], parents[k + 1]);
         }
         
-        children[Constants.PARENTS_SIZE - 1] = BaseIndividual.createFromParents(parents[0], parents[Constants.PARENTS_SIZE - 1]);
+        children[parents.length - 1] = BaseIndividual.createFromParents(parents[0], parents[parents.length - 1]);
         return children;
     }
 
