@@ -13,7 +13,7 @@ public abstract class BaseIndividual {
             return new BinaryIndividual();
         }
         else if (phenotypeRepresentation == PhenotypeRepresentation.DOUBLE &&
-        genotypeRepresentation == GenotypeRepresentation.BINARY) {
+        genotypeRepresentation == GenotypeRepresentation.DOUBLE) {
             return new DoubleIndividual();
         }
 

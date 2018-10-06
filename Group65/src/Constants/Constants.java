@@ -12,9 +12,9 @@ public class Constants{
 
     public final static int FITTEST_SIZE = POPULATION_SIZE - RECOMBINATION_SIZE - MUTATION_SIZE;
 
-    public final static int CYCLES_SIZE = 100;
+    public final static int CYCLES_SIZE = 1000;
 
-    public final static int LAST_CYCLES_WITHOUT_MUTATION = 2;
+    public final static int LAST_CYCLES_WITHOUT_MUTATION = 100;
 
     public final static MutationType CURRENT_MUTATION_TYPE = MutationType.BINARY;
 
@@ -22,7 +22,7 @@ public class Constants{
     
     public final static PhenotypeRepresentation CURRENT_PHENOTYPE_REPRESENTATION = PhenotypeRepresentation.DOUBLE;
     
-    public final static GenotypeRepresentation CURRENT_GENOTYPE_REPRESENTATION = GenotypeRepresentation.BINARY;
+    public final static GenotypeRepresentation CURRENT_GENOTYPE_REPRESENTATION = GenotypeRepresentation.DOUBLE;
 
     public final static int BINARY_REPRESENTATION_LENGTH = 5;
 

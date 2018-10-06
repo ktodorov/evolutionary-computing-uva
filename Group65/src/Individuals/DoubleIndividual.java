@@ -19,6 +19,7 @@ public class DoubleIndividual extends BaseIndividual {
         double p_x = Math.random();
         double p_y = 1 - p_x;
         phenotype = p_x * firstParent.phenotype + p_y * secondParent.phenotype;
+        this.genotype = this.phenotype;
         this.fitness = calculateFitness();
     }
 
