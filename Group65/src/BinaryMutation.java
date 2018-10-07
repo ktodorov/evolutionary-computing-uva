@@ -1,5 +1,3 @@
-package Mutations;
-
 public class BinaryMutation{
     public static int[] mutate(int[] arrayToMutate){
         int randomIndex = (int)(Math.random() * arrayToMutate.length);

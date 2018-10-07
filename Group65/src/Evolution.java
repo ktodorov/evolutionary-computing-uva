@@ -1,7 +1,3 @@
-package Execution;
-
-import Constants.Constants;
-import Individuals.BaseIndividual;
 import org.vu.contest.ContestEvaluation;
 
 public class Evolution {
@@ -22,10 +18,10 @@ public class Evolution {
             Constants.CURRENT_PHENOTYPE_REPRESENTATION,
             Constants.CURRENT_GENOTYPE_REPRESENTATION);
 
-        System.out.println("\nInitial Execution.Population");
-        tribe.print();
-        tribe.printStats();
-        System.out.println("_,.-'love is in the air'-.,_");
+        //System.out.println("\nInitial Execution.Population");
+        //tribe.print();
+        //tribe.printStats();
+        //System.out.println("_,.-'love is in the air'-.,_");
 
         for (int i = 0; i < Constants.CYCLES_SIZE; i++) {
             int fittestSize = Constants.FITTEST_SIZE;
@@ -62,8 +58,8 @@ public class Evolution {
             tribe = nextGeneration;
         }
 
-        System.out.println("--\nFinal Execution.Population");
-        tribe.print();
-        tribe.printStats();
+        //System.out.println("--\nFinal Execution.Population");
+        //tribe.print();
+        //tribe.printStats();
     }
 }

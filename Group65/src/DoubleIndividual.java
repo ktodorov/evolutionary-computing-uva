@@ -1,10 +1,3 @@
-package Individuals;
-
-import Execution.Evolution;
-import Helpers.*;
-import Enums.*;
-import Constants.Constants;
-import Execution.*;
 public class DoubleIndividual extends BaseIndividual {
     private double[] phenotype;
     private double[] genotype;
@@ -53,7 +46,8 @@ public class DoubleIndividual extends BaseIndividual {
 
 
     protected double calculateFitness() {
-        return (double) Evolution.eval.evaluate(this.phenotype);
+        //don't run this too often!
+        return (double) Evolution.eval.evaluate(this.genotype);
 
         //Our testing
         /*

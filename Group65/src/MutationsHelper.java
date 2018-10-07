@@ -1,9 +1,3 @@
-package Helpers;
-
-import Enums.MutationType;
-import Mutations.DoubleMutation;
-import Mutations.BinaryMutation;
-
 public class MutationsHelper{
     public static int[] mutateByType(int[] arrayToMutate, MutationType mutation){
         if (arrayToMutate == null || mutation == null){

@@ -1,11 +1,3 @@
-package Execution;
-
-import Constants.*;
-import Enums.*;
-import Helpers.*;
-import Individuals.*;
-import Mutations.*;
-
 import org.vu.contest.*;
 import java.util.Random;
 import java.util.Properties;
@@ -68,7 +60,7 @@ public class player65 implements ContestSubmission
 		*/
 
         //OUR STUFF
-		Evolution.startEvolutionaryAlgorithm(evaluation_);
+		Evolution.startEvolutionaryAlgorithm(this.evaluation_);
 
 	}
 }

@@ -1,4 +1,3 @@
-package Mutations;
 import java.util.Random;
 
 public class DoubleMutation {

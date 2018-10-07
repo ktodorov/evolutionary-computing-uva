@@ -1,7 +1,3 @@
-package Helpers;
-
-import Constants.Constants;
-
 public class MathHelper {
     
     // Turns the input value x into a binary String of length "binaryLength"

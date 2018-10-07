@@ -1,7 +1,3 @@
-package Individuals;
-
-import Enums.*;
-
 public abstract class BaseIndividual {
     protected double fitness;
 

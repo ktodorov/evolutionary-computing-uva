@@ -1,14 +1,5 @@
-package Execution;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-
-import Constants.Constants;
-import Enums.*;
-import Individuals.BaseIndividual;
-import Helpers.ArrayHelper;
-import Helpers.MutationsHelper;
 
 public class Population {
     private BaseIndividual[] people;

@@ -1,9 +1,3 @@
-package Individuals;
-
-import Helpers.*;
-import Constants.Constants;
-import Enums.*;
-
 public class BinaryIndividual extends BaseIndividual {
     private double[] phenotype;
     private int[][] genotype;
