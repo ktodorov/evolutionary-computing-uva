@@ -5,7 +5,7 @@ import java.lang.reflect.Array;
 public class ArrayHelper {
     public static <T> T[] removeElementFromArray(T[] array, int index){
         if(array.length <= 0){
-            System.out.println("Population empty. Abort");
+            System.out.println("Execution.Population empty. Abort");
             return array;
         }
 

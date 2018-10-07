@@ -1,9 +1,13 @@
-import Constants.Constants;
-import Enums.*;
-import Individuals.BaseIndividual;
+package Execution;
 
-class Evolution {
-    static void startEvolutionaryAlgorithm() {
+import Constants.Constants;
+import Individuals.BaseIndividual;
+import org.vu.contest.ContestEvaluation;
+
+public class Evolution {
+    public static ContestEvaluation eval;
+    static void startEvolutionaryAlgorithm(ContestEvaluation evaluation) {
+        eval = evaluation;
         /*
         General idea for selection of new generation:
         Choose 60% of old generation for recombination using roulette. Apply mutation to 5% of them as well.
@@ -18,7 +22,7 @@ class Evolution {
             Constants.CURRENT_PHENOTYPE_REPRESENTATION,
             Constants.CURRENT_GENOTYPE_REPRESENTATION);
 
-        System.out.println("\nInitial Population");
+        System.out.println("\nInitial Execution.Population");
         tribe.print();
         tribe.printStats();
         System.out.println("_,.-'love is in the air'-.,_");
@@ -54,11 +58,11 @@ class Evolution {
             }
 
             // SURVIVOR SELECTION
-            // implicitly done via the Population.nextGeneration
+            // implicitly done via the Execution.Population.nextGeneration
             tribe = nextGeneration;
         }
 
-        System.out.println("--\nFinal Population");
+        System.out.println("--\nFinal Execution.Population");
         tribe.print();
         tribe.printStats();
     }

@@ -1,16 +1,22 @@
-import org.vu.contest.ContestSubmission;
-import org.vu.contest.ContestEvaluation;
+package Execution;
 
+import Constants.*;
+import Enums.*;
+import Helpers.*;
+import Individuals.*;
+import Mutations.*;
+
+import org.vu.contest.*;
 import java.util.Random;
 import java.util.Properties;
 
-public class player0 implements ContestSubmission
+public class player65 implements ContestSubmission
 {
 	Random rnd_;
 	ContestEvaluation evaluation_;
     private int evaluations_limit_;
 	
-	public player0()
+	public player65()
 	{
 		rnd_ = new Random();
 	}
@@ -44,10 +50,9 @@ public class player0 implements ContestSubmission
         }
     }
     
-	public void run()
-	{
+	public void run() {
 		// Run your algorithm here
-        
+		/*
         int evals = 0;
         // init population
         // calculate fitness
@@ -60,6 +65,10 @@ public class player0 implements ContestSubmission
             evals++;
             // Select survivors
         }
+		*/
+
+        //OUR STUFF
+		Evolution.startEvolutionaryAlgorithm(evaluation_);
 
 	}
 }

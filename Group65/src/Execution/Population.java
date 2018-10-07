@@ -1,3 +1,5 @@
+package Execution;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -68,8 +70,7 @@ public class Population {
 
     public BaseIndividual[] createNewChildren(int count) {
         BaseIndividual[] parents = this.selectParents(count);
-        BaseIndividual[] newChildren = recombine(parents);
-        return newChildren;
+        return recombine(parents);
     }
 
     public BaseIndividual[] mutateIndividuals(int count) {
@@ -91,7 +92,7 @@ public class Population {
     // Beware of Individual.setEncoding for changes in #starter
     public void addIndividuals(BaseIndividual[] individualsToAdd){
         if(this.people.length >= Constants.POPULATION_SIZE) {
-            System.out.println("Population full. Abort");
+            System.out.println("Execution.Population full. Abort");
         }
         else {
             int newSize = this.people.length + individualsToAdd.length;

@@ -168,7 +168,7 @@ public class JNIfgeneric {
      *  @return the objective function value for the given search point */
     public native double evaluate(double[] X);
 
-    /* Main method
+    /* Execution.Main method
 
     /**
      * Test Method.
