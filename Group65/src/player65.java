@@ -2,6 +2,14 @@ import org.vu.contest.*;
 import java.util.Random;
 import java.util.Properties;
 
+/*
+javac -cp .\contest.jar player65.java ArrayHelper.java BaseIndividual.java BinaryIndividual.java BinaryMutation.java Constants.java DoubleIndividual.java DoubleMutation.java Evolution.java GenotypeRepresentation.java Main.java MathHelper.java MutationsHelper.java MutationType.java ParentSelectionType.java PhenotypeRepresentation.java Population.java
+
+jar cmf MainClass.txt submission.jar player65.class ArrayHelper.class BaseIndividual.class BinaryIndividual.class BinaryMutation.class Constants.class DoubleIndividual.class DoubleMutation.class Evolution.class GenotypeRepresentation.class Main.class MathHelper.class MutationsHelper.class MutationType.class ParentSelectionType.class PhenotypeRepresentation.class Population.class '.\Population$1.class' '.\MutationsHelper$1.class'
+
+jar uf contest.jar player65.class ArrayHelper.class BaseIndividual.class BinaryIndividual.class BinaryMutation.class Constants.class DoubleIndividual.class DoubleMutation.class Evolution.class GenotypeRepresentation.class Main.class MathHelper.class MutationsHelper.class MutationType.class ParentSelectionType.class PhenotypeRepresentation.class Population.class '.\Population$1.class' '.\MutationsHelper$1.class'
+*/
+
 public class player65 implements ContestSubmission
 {
 	Random rnd_;
