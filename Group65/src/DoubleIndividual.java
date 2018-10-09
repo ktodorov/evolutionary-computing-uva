@@ -1,10 +1,12 @@
 public class DoubleIndividual extends BaseIndividual {
     private double[] phenotype;
     private double[] genotype;
+    private double probabilities;
     
     public DoubleIndividual() {
         this.phenotype = new double[10];
         this.genotype = new double[10];
+        this.probabilities = 0;
         for (int i = 0; i < 10; i++) {
             this.phenotype[i] = Math.random() * Constants.MAX_PHENOTYPE_NUMBER_SIZE;
             this.genotype[i] = this.phenotype[i];
@@ -18,7 +20,7 @@ public class DoubleIndividual extends BaseIndividual {
         double p_y = 1 - p_x;
         this.phenotype = new double[10];
         this.genotype = new double[10];
-
+        this.probabilities = 0;
         for (int i = 0; i < 10; i++) {
             this.phenotype[i] = p_x * firstParent.phenotype[i] + p_y * secondParent.phenotype[i];
             this.genotype[i] = this.phenotype[i];
@@ -44,6 +46,12 @@ public class DoubleIndividual extends BaseIndividual {
         System.out.println(printer +"], Fitness: " + this.fitness);
     }
 
+    public void setProbabilities(double p){
+        this.probabilities = p;
+    }
+    public double getProbabilities(){
+        return this.probabilities;
+    }
 
     protected double calculateFitness() {
         //don't run this too often!

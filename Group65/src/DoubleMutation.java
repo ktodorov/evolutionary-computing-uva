@@ -2,7 +2,14 @@ import java.util.Random;
 
 public class DoubleMutation {
     public static double mutate(double DoubleToMutate){
+        //new normal distribution
+        double c1 = 1; //constant for standard deviation of gaussian distribution
+        double t1 = c1 / (Math.sqrt(Constants.POPULATION_SIZE));
         Random gaussianFactor = new Random();
-        return (gaussianFactor.nextGaussian()*2+DoubleToMutate);
+
+        return gaussianFactor.nextGaussian()*t1+DoubleToMutate;
+
+        //old gaussian
+        //return (gaussianFactor.nextGaussian()*2+DoubleToMutate);
     }
 }

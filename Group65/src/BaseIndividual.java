@@ -35,5 +35,9 @@ public abstract class BaseIndividual {
 
     public abstract void print();
 
+    public abstract void setProbabilities(double p);
+
+    public abstract double getProbabilities();
+
     protected abstract double calculateFitness();
 }

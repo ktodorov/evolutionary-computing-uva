@@ -113,6 +113,14 @@ public class Population {
         System.out.println("Average individual fitness: " + overallFitness / this.people.length);
     }
 
+    private void createProbabilitiesBasedOnRank(){
+        sortPeopleByFitnessReversed();
+        double c = 0.55;
+        for (int i = 0; i < this.people.length; i++) {
+            this.people[i].setProbabilities(Math.pow(c, this.people.length-1-i)*(c-1) / (Math.pow(c, this.people.length)-1));
+        }
+    }
+
     private BaseIndividual[] selectParentsByRouletteWheel(int count) {
         // initialize new array for parents
         BaseIndividual[] parents = new BaseIndividual[count];
@@ -123,6 +131,7 @@ public class Population {
 
         // sort the people
         sortPeopleByFitness();
+        createProbabilitiesBasedOnRank();
         BaseIndividual[] peopleCopy = ArrayHelper.copyArray(this.people);
 
         double overallFitness = this.calculateOverallFitness();
@@ -133,7 +142,12 @@ public class Population {
             int k = 0;
             double cumulativeProb = 0;
             while(cumulativeProb < r && k >= peopleCopy.length){
-                double personProbability = peopleCopy[k].getFitness() / overallFitness;
+                //new rank based probabilities
+                double personProbability = peopleCopy[k].getProbabilities();
+
+                //old fitness based probabilities
+                //double personProbability = peopleCopy[k].getFitness() / overallFitness;
+
                 cumulativeProb += personProbability;
                 k++;
             }
@@ -191,5 +205,8 @@ public class Population {
 
     private void sortPeopleByFitness(){
         Arrays.sort(this.people, Comparator.comparingDouble(BaseIndividual::getFitness).reversed());
+    }
+    private void sortPeopleByFitnessReversed(){
+        Arrays.sort(this.people, Comparator.comparingDouble(BaseIndividual::getFitness));
     }
 }

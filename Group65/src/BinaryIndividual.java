@@ -55,6 +55,13 @@ public class BinaryIndividual extends BaseIndividual {
 
     }
 
+    public void setProbabilities(double p){
+
+    }
+
+    public double getProbabilities(){
+        return 0;
+    }
 
     protected double calculateFitness() {
         double result = 0;
