@@ -2,8 +2,8 @@ import org.vu.contest.ContestEvaluation;
 
 public class Evolution {
     public static ContestEvaluation eval;
-    static void startEvolutionaryAlgorithm(ContestEvaluation evaluation) {
-        eval = evaluation;
+    static void startEvolutionaryAlgorithm(ContestEvaluation evaluation, int eval_limit) {
+        eval= evaluation;
         /*
         General idea for selection of new generation:
         Choose 60% of old generation for recombination using roulette. Apply mutation to 5% of them as well.
@@ -22,16 +22,19 @@ public class Evolution {
         //tribe.print();
         //tribe.printStats();
         //System.out.println("_,.-'love is in the air'-.,_");
+        int fittestSize = Constants.FITTEST_SIZE;
+        int recombinationSize = Constants.RECOMBINATION_SIZE;
+        int mutationSize = Constants.MUTATION_SIZE;
 
-        for (int i = 0; i < Constants.CYCLES_SIZE; i++) {
-            int fittestSize = Constants.FITTEST_SIZE;
-            int recombinationSize = Constants.RECOMBINATION_SIZE;
-            int mutationSize = Constants.MUTATION_SIZE;
+        for (int i = 0; i < eval_limit/Constants.POPULATION_SIZE-80; i++) {
+            //System.out.print("Generation ");
+            //System.out.println(i);
+
 
             // If we reach the last LAST_CYCLES_WITHOUT_MUTATION cycles, 
             // we must stop mutating in order to preserve the currently found good population
-            if (Constants.CYCLES_SIZE - i < Constants.LAST_CYCLES_WITHOUT_MUTATION) {
-                fittestSize += Constants.MUTATION_SIZE;
+            if (eval_limit/Constants.POPULATION_SIZE - i < Constants.LAST_CYCLES_WITHOUT_MUTATION) {
+                fittestSize = Constants.FITTEST_SIZE + Constants.MUTATION_SIZE;
                 mutationSize = 0;
             }
 
@@ -49,11 +52,11 @@ public class Evolution {
 
             // MUTATION
             if (mutationSize > 0) {
-                BaseIndividual[] mutatedChildren = tribe.mutateIndividuals(Constants.MUTATION_SIZE);
+                BaseIndividual[] mutatedChildren = tribe.mutateIndividualsByDouble(mutationSize);
                 nextGeneration.addIndividuals(mutatedChildren);
             }
 
-            BaseIndividual[] fittestIndividuals = tribe.getTopIndividuals(Constants.POPULATION_SIZE);
+            BaseIndividual[] fittestIndividuals = tribe.getTopIndividuals(fittestSize);
             nextGeneration.addIndividuals(fittestIndividuals);
 
             tribe = nextGeneration;

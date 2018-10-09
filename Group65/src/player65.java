@@ -68,7 +68,7 @@ public class player65 implements ContestSubmission
 		*/
 
         //OUR STUFF
-		Evolution.startEvolutionaryAlgorithm(this.evaluation_);
+		Evolution.startEvolutionaryAlgorithm(this.evaluation_, evaluations_limit_);
 
 	}
 }

@@ -40,4 +40,8 @@ public abstract class BaseIndividual {
     public abstract double getProbabilities();
 
     protected abstract double calculateFitness(boolean skipIfAlreadyCalculated);
+
+    public abstract void setGenotypeDouble(double[] a);
+
+    public abstract double[] getGenotypeDouble();
 }

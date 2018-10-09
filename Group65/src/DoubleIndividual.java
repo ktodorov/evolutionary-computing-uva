@@ -1,6 +1,6 @@
 public class DoubleIndividual extends BaseIndividual {
-    private double[] phenotype;
-    private double[] genotype;
+    public double[] phenotype;
+    public double[] genotype;
     private double probabilities;
     
     public DoubleIndividual() {
@@ -10,7 +10,7 @@ public class DoubleIndividual extends BaseIndividual {
         this.fitness = -1;
 
         for (int i = 0; i < 10; i++) {
-            this.phenotype[i] = Math.random() * Constants.MAX_PHENOTYPE_NUMBER_SIZE;
+            this.phenotype[i] = (Math.random() * Constants.DIMENSIONS) - 5; //Randomly distributed between [-5, 5]
             this.genotype[i] = this.phenotype[i];
         }
     }
@@ -20,7 +20,7 @@ public class DoubleIndividual extends BaseIndividual {
         return recombineIndividualBySwappingTails(firstParent, secondParent);
     }
 
-    private static DoubleIndividual[] recombineIndividualsByWholeArithmetic(DoubleIndividual firstParent, DoubleIndividual secondParent) {
+    public static DoubleIndividual[] recombineIndividualsByWholeArithmetic(DoubleIndividual firstParent, DoubleIndividual secondParent) {
         //average between two parents by random probabilities x and 1-x. Use same probability for all 10 dimensions
         double p_x = Math.random();
         double p_y = 1 - p_x;
@@ -43,7 +43,7 @@ public class DoubleIndividual extends BaseIndividual {
         return result;
     }
 
-    private static DoubleIndividual[] recombineIndividualBySwappingTails(DoubleIndividual firstParent, DoubleIndividual secondParent) {
+    public static DoubleIndividual[] recombineIndividualBySwappingTails(DoubleIndividual firstParent, DoubleIndividual secondParent) {
         DoubleIndividual firstIndividual = new DoubleIndividual();
         DoubleIndividual secondIndividual = new DoubleIndividual();
 
@@ -73,10 +73,14 @@ public class DoubleIndividual extends BaseIndividual {
         return result;
     }
 
+
     public void mutate(MutationType mutationType) {
+        /*
         int i = (int) Math.random() * 9;
         this.genotype[i] = MutationsHelper.mutateByType(this.genotype[i], mutationType);
         this.phenotype[i] = this.genotype[i];
+        */
+        System.out.println("this shouldn't be used.");
     }
 
     //Messy for 10 dimensions
@@ -95,6 +99,17 @@ public class DoubleIndividual extends BaseIndividual {
     public double getProbabilities(){
         return this.probabilities;
     }
+    public double[] getPhenotypeDouble(){
+        return this.phenotype;
+    }
+    public void setGenotypeDouble(double[] a){
+        this.genotype = a;
+        this.phenotype = this.genotype;
+    }
+    public double[] getGenotypeDouble(){
+        return this.genotype;
+    }
+
 
     public static int counter = 0;
     protected double calculateFitness(boolean skipIfAlreadyCalculated) {
@@ -103,7 +118,8 @@ public class DoubleIndividual extends BaseIndividual {
             return this.fitness;
         }
 
-        System.out.println("calculating fitness: " + counter++);
+        //System.out.println("calculating fitness: " + counter++);
+        //System.out.println(Evolution.eval.evaluate(this.genotype));
         return (double) Evolution.eval.evaluate(this.genotype);
 
         //Our testing

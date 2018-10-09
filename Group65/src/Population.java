@@ -1,10 +1,13 @@
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Random;
 
 public class Population {
     private BaseIndividual[] people;
     private MutationType mutationType;
     private ParentSelectionType parentSelectionType;
+    private double[] mean;
+    private double[] standardDeviation;
 
     public Population(
         MutationType mutationType, 
@@ -15,13 +18,23 @@ public class Population {
         this.mutationType = mutationType;
         this.parentSelectionType = parentSelectionType;
         this.people = new BaseIndividual[Constants.POPULATION_SIZE];
-        
+        this.initializeMeanAndVariance();
+
         // Initialize each individual
         for (int i = 0; i < this.people.length; i++) {
             this.people[i] = BaseIndividual.createIndividualForRepresentation(phenotypeRepresentation, genotypeRepresentation);
         }
     }
 
+    public void initializeMeanAndVariance(){
+        this.mean = new double[10];
+        this.standardDeviation = new double[10];
+        // Initialize the means and variances
+        for (int i = 0; i < 10; i++) {
+            this.mean[i] = 0;
+            this.standardDeviation[i] = 0;
+        }
+    }
     public Population(
         MutationType mutationType, 
         ParentSelectionType parentSelectionType) {
@@ -29,6 +42,8 @@ public class Population {
         this.mutationType = mutationType;
         this.parentSelectionType = parentSelectionType;
         this.people = new BaseIndividual[0];
+
+        this.initializeMeanAndVariance();
     }
 
     public Population(
@@ -79,14 +94,59 @@ public class Population {
         return recombine(parents);
     }
 
-    public BaseIndividual[] mutateIndividuals(int count) {
+    public BaseIndividual[] mutateIndividualsByDouble(int count) {
         // Currently randomly select from population
         BaseIndividual[] individualsForMutation = this.getRandomIndividuals(count);
-        
-        for (BaseIndividual individual : individualsForMutation) {
-            individual.mutate(mutationType);
+        System.out.println("NEW ROUND OF MUTATION\n");
+
+        //Initialize some variables
+        this.initializeMeanAndVariance();
+        Random rand = new Random();
+        double constantGaussian = rand.nextGaussian();
+        double t1 = 1/Math.sqrt(2*Constants.DIMENSIONS);
+        double t2 = 1/Math.sqrt(2*Math.sqrt(Constants.DIMENSIONS));
+        double[] changingGauss = new double[10];
+        for (int a = 0; a < 10; a++) {
+            changingGauss[a] = rand.nextGaussian();
         }
 
+        //Find Standard Deviation
+        for (int j = 0; j < Constants.DIMENSIONS; j++) {
+            System.out.print("DIMENSION ");
+            System.out.println(j);
+            for (int i = 0; i < this.people.length; i++) {
+                this.mean[j] += this.people[i].getGenotypeDouble()[j];
+            }
+            this.mean[j] /= this.people.length;
+            for (int p = 0; p < this.people.length; p++) {
+                this.standardDeviation[j] += Math.pow(this.people[p].getGenotypeDouble()[j], 2);
+            }
+            this.standardDeviation[j] /= this.people.length;
+            this.standardDeviation[j] -= Math.pow(this.mean[j], 2);
+            this.standardDeviation[j] = Math.sqrt(this.standardDeviation[j]);
+            this.standardDeviation[j] = this.standardDeviation[j] * Math.exp(t1 * constantGaussian + t2 * changingGauss[j]);
+            System.out.println("\nMEAN");
+            System.out.println(this.mean[j]);
+            System.out.println("\nStandard Deviation");
+            System.out.println(this.standardDeviation[j]);
+        }
+
+        //Mutate
+        System.out.println("GENOTYPES");
+        for (int k = 0; k < individualsForMutation.length; k++) {
+            double[] newGenotype = new double[10];
+            for (int j = 0; j < Constants.DIMENSIONS; j++) {
+                newGenotype[j] = individualsForMutation[k].getGenotypeDouble()[j] + this.standardDeviation[j] * changingGauss[j];
+                //System.out.println("OLD");
+                //System.out.println(individualsForMutation[k].getGenotypeDouble()[j]);
+                //System.out.println("NEW");
+                //System.out.println(newGenotype[j]);
+                System.out.print(newGenotype[j]);
+                System.out.println(", ");
+            }
+
+            individualsForMutation[k].setGenotypeDouble(newGenotype);
+        }
         return individualsForMutation;
     }
 
@@ -147,7 +207,7 @@ public class Population {
         // sort the people
         sortPeopleByFitness();
         createProbabilitiesBasedOnRank();
-        BaseIndividual[] peopleCopy = ArrayHelper.copyArray(this.people);
+        //BaseIndividual[] people = ArrayHelper.copyArray(this.people);
 
         double overallFitness = this.calculateOverallFitness();
 
@@ -156,12 +216,12 @@ public class Population {
             double r = Math.random();
             int k = 0;
             double cumulativeProb = 0;
-            while(cumulativeProb < r && k >= peopleCopy.length){
+            while(cumulativeProb < r && k >= this.people.length){
                 //new rank based probabilities
-                double personProbability = peopleCopy[k].getProbabilities();
+                double personProbability = this.people[k].getProbabilities();
 
                 //old fitness based probabilities
-                //double personProbability = peopleCopy[k].getFitness() / overallFitness;
+                //double personProbability = this.people[k].getFitness() / overallFitness;
 
                 cumulativeProb += personProbability;
                 k++;
@@ -172,11 +232,11 @@ public class Population {
             }
 
             // parent at position k was found and is added to final array
-            parents[currentMember] = peopleCopy[k];
+            parents[currentMember] = this.people[k];
 
             // prevent choosing Individuals twice
-            overallFitness -= peopleCopy[k].getFitness();
-            peopleCopy = ArrayHelper.removeElementFromArray(peopleCopy, k);
+            overallFitness -= this.people[k].getFitness();
+            this.people = ArrayHelper.removeElementFromArray(this.people, k);
             
             currentMember++;
         }
@@ -196,9 +256,20 @@ public class Population {
     }
 
     private BaseIndividual[] recombine(BaseIndividual[] parents) {
-        // TODO which parents mate with each other? Currently neighborhood relation!
+        BaseIndividual[] children = new BaseIndividual[parents.length];
+        for (int k = 0; k < parents.length - 1; k+=2) {
+            //DoubleIndividual[] newChildren = DoubleIndividual.recombineIndividualsByWholeArithmetic((DoubleIndividual) parents[k], (DoubleIndividual) parents[k + 1]);
+            DoubleIndividual[] newChildren = DoubleIndividual.recombineIndividualBySwappingTails((DoubleIndividual) parents[k], (DoubleIndividual) parents[k + 1]);
+            children[k] = newChildren[0];
+            children[k+1] = newChildren[1];
+        }
 
-        // 1 with 2, 2 with 3, 3 with 4, ..., n with 1. (Circular!)
+        return children;
+
+
+        /* OLD
+         TODO which parents mate with each other? Currently neighborhood relation!
+         1 with 2, 2 with 3, 3 with 4, ..., n with 1. (Circular!)
         BaseIndividual[] children = new BaseIndividual[parents.length];
         for (int k = 0; k < parents.length - 1; k+=2) {
             BaseIndividual[] newChildren = BaseIndividual.createFromParents(parents[k], parents[k + 1]);
@@ -207,6 +278,7 @@ public class Population {
         }
 
         return children;
+        */
     }
 
     // Calculate the sum over all individuals' fitnesses

@@ -12,7 +12,7 @@ public class BinaryIndividual extends BaseIndividual {
             this.genotype[i] = MathHelper.makeBinary((int)this.phenotype[i]);
         }
     }
-    
+
     public static BinaryIndividual[] createNewChildren(BinaryIndividual firstParent, BinaryIndividual secondParent) {
         return recombineIndividualBySwappingTails(firstParent, secondParent);
     }
@@ -82,11 +82,19 @@ public class BinaryIndividual extends BaseIndividual {
         if (skipIfAlreadyCalculated && this.fitness != -1) {
             return this.fitness;
         }
-
         double result = 0;
         for (double value : this.phenotype) {
             result += value*value;
         }
         return result;
+    }
+
+    public double[] getGenotypeDouble(){
+        return null;
+    }
+
+
+    public void setGenotypeDouble(double[] a){
+        return;
     }
 }
