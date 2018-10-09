@@ -24,6 +24,15 @@ public class Population {
 
     public Population(
         MutationType mutationType, 
+        ParentSelectionType parentSelectionType) {
+
+        this.mutationType = mutationType;
+        this.parentSelectionType = parentSelectionType;
+        this.people = new BaseIndividual[0];
+    }
+
+    public Population(
+        MutationType mutationType, 
         ParentSelectionType parentSelectionType,
         BaseIndividual[] individuals) {
 
@@ -44,6 +53,12 @@ public class Population {
         }
 
         return randomIndividuals;
+    }
+
+    public void recalculateFitness() {
+        for (BaseIndividual individual : this.people) {
+            individual.calculateFitness(true);
+        }
     }
 
     public BaseIndividual[] getTopIndividuals(int count) {
@@ -185,11 +200,12 @@ public class Population {
 
         // 1 with 2, 2 with 3, 3 with 4, ..., n with 1. (Circular!)
         BaseIndividual[] children = new BaseIndividual[parents.length];
-        for (int k = 0; k < parents.length - 1; k++) {
-            children[k] = BaseIndividual.createFromParents(parents[k], parents[k + 1]);
+        for (int k = 0; k < parents.length - 1; k+=2) {
+            BaseIndividual[] newChildren = BaseIndividual.createFromParents(parents[k], parents[k + 1]);
+            children[k] = newChildren[0];
+            children[k+1] = newChildren[1];
         }
-        
-        children[parents.length - 1] = BaseIndividual.createFromParents(parents[0], parents[parents.length - 1]);
+
         return children;
     }
 

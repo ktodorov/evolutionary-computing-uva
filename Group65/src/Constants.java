@@ -2,15 +2,15 @@ public class Constants{
     
     public final static int POPULATION_SIZE = 100;
 
-    public final static int RECOMBINATION_SIZE = 60;
+    public final static int RECOMBINATION_SIZE = 98;
 
-    public final static int MUTATION_SIZE = 30;
+    public final static int MUTATION_SIZE = POPULATION_SIZE - RECOMBINATION_SIZE;
 
     public final static int FITTEST_SIZE = POPULATION_SIZE - RECOMBINATION_SIZE - MUTATION_SIZE;
 
-    public final static int CYCLES_SIZE = 100;
+    public final static int CYCLES_SIZE = 95;
 
-    public final static int LAST_CYCLES_WITHOUT_MUTATION = 70;
+    public final static int LAST_CYCLES_WITHOUT_MUTATION = 5;
 
     public final static MutationType CURRENT_MUTATION_TYPE = MutationType.DOUBLE;
 

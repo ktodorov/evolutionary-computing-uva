@@ -1,5 +1,5 @@
 public abstract class BaseIndividual {
-    protected double fitness;
+    protected double fitness = -1;
 
     public static BaseIndividual createIndividualForRepresentation(
         PhenotypeRepresentation phenotypeRepresentation,
@@ -20,12 +20,12 @@ public abstract class BaseIndividual {
         return this.fitness;
     }
 
-    public static BaseIndividual createFromParents(BaseIndividual firstParent, BaseIndividual secondParent) {
+    public static BaseIndividual[] createFromParents(BaseIndividual firstParent, BaseIndividual secondParent) {
         if (firstParent instanceof BinaryIndividual) {
-            return new BinaryIndividual((BinaryIndividual)firstParent, (BinaryIndividual)secondParent);
+            return BinaryIndividual.createNewChildren((BinaryIndividual)firstParent, (BinaryIndividual)secondParent);
         }
         else if (firstParent instanceof DoubleIndividual) {
-            return new DoubleIndividual((DoubleIndividual)firstParent, (DoubleIndividual)secondParent);
+            return DoubleIndividual.createNewChildren((DoubleIndividual)firstParent, (DoubleIndividual)secondParent);
         }
 
         return null;
@@ -39,5 +39,5 @@ public abstract class BaseIndividual {
 
     public abstract double getProbabilities();
 
-    protected abstract double calculateFitness();
+    protected abstract double calculateFitness(boolean skipIfAlreadyCalculated);
 }

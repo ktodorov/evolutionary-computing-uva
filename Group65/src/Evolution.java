@@ -35,11 +35,11 @@ public class Evolution {
                 mutationSize = 0;
             }
 
-            BaseIndividual[] fittestIndividuals = tribe.getTopIndividuals(fittestSize);
+            tribe.recalculateFitness();
+            
             Population nextGeneration = new Population(
                 Constants.CURRENT_MUTATION_TYPE,
-                Constants.CURRENT_PARENT_SELECTION_TYPE,
-                fittestIndividuals);
+                Constants.CURRENT_PARENT_SELECTION_TYPE);
 
             // RECOMBINATION
             if (recombinationSize > 0) {
@@ -53,8 +53,9 @@ public class Evolution {
                 nextGeneration.addIndividuals(mutatedChildren);
             }
 
-            // SURVIVOR SELECTION
-            // implicitly done via the Execution.Population.nextGeneration
+            BaseIndividual[] fittestIndividuals = tribe.getTopIndividuals(Constants.POPULATION_SIZE);
+            nextGeneration.addIndividuals(fittestIndividuals);
+
             tribe = nextGeneration;
         }
 
