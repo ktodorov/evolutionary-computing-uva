@@ -8,6 +8,7 @@ public class ArrayHelper {
         }
 
         int newSize = array.length - 1;
+        @SuppressWarnings("unchecked")
         T[] buffer = (T[])Array.newInstance(array.getClass().getComponentType(), newSize);
         System.arraycopy(array, 0, buffer, 0, index);
         System.arraycopy(array, index + 1, buffer, index, array.length - index - 1);
