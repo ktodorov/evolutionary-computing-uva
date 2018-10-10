@@ -59,6 +59,7 @@ public class BinaryIndividual extends BaseIndividual {
             this.phenotype[i] = MathHelper.makeDecimal(this.genotype[i]);
         }
         this.fitness = calculateFitness(false);
+        System.out.println("THIS IS NOT USED");
     }
 
     //Messy for 10 dimensions

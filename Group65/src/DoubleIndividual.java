@@ -80,17 +80,20 @@ public class DoubleIndividual extends BaseIndividual {
         this.genotype[i] = MutationsHelper.mutateByType(this.genotype[i], mutationType);
         this.phenotype[i] = this.genotype[i];
         */
-        System.out.println("this shouldn't be used.");
+        System.out.println("this is currently not in use.");
     }
 
     //Messy for 10 dimensions
 
     public void print(){
-        String printer = "[";
+        /*System.out.print("[");
         for (int i = 0; i < 10; i++) {
-            printer += this.genotype[i]+"; ";
+            System.out.print(this.genotype[i]);
         }
-        System.out.println(printer +"], Fitness: " + this.fitness);
+        System.out.println("]");*/
+
+        System.out.print("FITNESS:");
+        System.out.println(this.fitness);
     }
 
     public void setProbabilities(double p){
@@ -113,22 +116,8 @@ public class DoubleIndividual extends BaseIndividual {
 
     public static int counter = 0;
     protected double calculateFitness(boolean skipIfAlreadyCalculated) {
-        //don't run this too often!
-        if (skipIfAlreadyCalculated && this.fitness != -1) {
-            return this.fitness;
-        }
-
-        //System.out.println("calculating fitness: " + counter++);
-        //System.out.println(Evolution.eval.evaluate(this.genotype));
-        return (double) Evolution.eval.evaluate(this.genotype);
-
-        //Our testing
-        /*
-        double result = 0;
-        for (double value : this.phenotype) {
-            result += value*value;
-        }
-        return result;
-        */
+        Constants.FITNESS_EVALUATIONS++; //Easier to track evaluations during testing
+        this.fitness = (double) Evolution.eval.evaluate(this.genotype);
+        return this.fitness;
     }
 }

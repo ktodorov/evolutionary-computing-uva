@@ -4,42 +4,32 @@ public class Evolution {
     public static ContestEvaluation eval;
     static void startEvolutionaryAlgorithm(ContestEvaluation evaluation, int eval_limit) {
         eval= evaluation;
-        /*
-        General idea for selection of new generation:
-        Choose 60% of old generation for recombination using roulette. Apply mutation to 5% of them as well.
-        Choose 20% of the remaining old generation for mutation.
-        Choose the 20% strongest individuals of old generation without any modification.
-        = new generation!
-        */
         
         Population tribe = new Population(
             Constants.CURRENT_MUTATION_TYPE,
             Constants.CURRENT_PARENT_SELECTION_TYPE,
             Constants.CURRENT_PHENOTYPE_REPRESENTATION,
             Constants.CURRENT_GENOTYPE_REPRESENTATION);
-
-        //System.out.println("\nInitial Execution.Population");
-        //tribe.print();
-        //tribe.printStats();
-        //System.out.println("_,.-'love is in the air'-.,_");
         int fittestSize = Constants.FITTEST_SIZE;
         int recombinationSize = Constants.RECOMBINATION_SIZE;
         int mutationSize = Constants.MUTATION_SIZE;
-
-        for (int i = 0; i < eval_limit/Constants.POPULATION_SIZE-80; i++) {
+        int last_cycles_without_mutation = (eval_limit/Constants.POPULATION_SIZE)/10;
+        for (int i = 0; i < eval_limit/Constants.POPULATION_SIZE; i++) {
             //System.out.print("Generation ");
             //System.out.println(i);
 
-
             // If we reach the last LAST_CYCLES_WITHOUT_MUTATION cycles, 
             // we must stop mutating in order to preserve the currently found good population
-            if (eval_limit/Constants.POPULATION_SIZE - i < Constants.LAST_CYCLES_WITHOUT_MUTATION) {
+            if (eval_limit/Constants.POPULATION_SIZE - i < last_cycles_without_mutation) {
                 fittestSize = Constants.FITTEST_SIZE + Constants.MUTATION_SIZE;
                 mutationSize = 0;
             }
-
+            //System.out.print("\nGENERATION ");
+            //System.out.println(i);
+            //System.out.println("EVALUATIONS");
+            //System.out.println(Constants.FITNESS_EVALUATIONS);
             tribe.recalculateFitness();
-            
+            //tribe.print();
             Population nextGeneration = new Population(
                 Constants.CURRENT_MUTATION_TYPE,
                 Constants.CURRENT_PARENT_SELECTION_TYPE);
@@ -61,9 +51,5 @@ public class Evolution {
 
             tribe = nextGeneration;
         }
-
-        //System.out.println("--\nFinal Execution.Population");
-        //tribe.print();
-        //tribe.printStats();
     }
 }

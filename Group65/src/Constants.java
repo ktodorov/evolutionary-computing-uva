@@ -1,5 +1,7 @@
 public class Constants{
 
+    public static int FITNESS_EVALUATIONS = 0;
+
     public final static int DIMENSIONS = 10;
 
     public final static int POPULATION_SIZE = 100;
@@ -11,8 +13,6 @@ public class Constants{
     public final static int FITTEST_SIZE = POPULATION_SIZE - RECOMBINATION_SIZE - MUTATION_SIZE;
 
     public final static int CYCLES_SIZE = 200;
-
-    public final static int LAST_CYCLES_WITHOUT_MUTATION = 10;
 
     public final static MutationType CURRENT_MUTATION_TYPE = MutationType.DOUBLE;
 
