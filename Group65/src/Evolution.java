@@ -10,26 +10,46 @@ public class Evolution {
             Constants.CURRENT_PARENT_SELECTION_TYPE,
             Constants.CURRENT_PHENOTYPE_REPRESENTATION,
             Constants.CURRENT_GENOTYPE_REPRESENTATION);
-        int fittestSize = Constants.FITTEST_SIZE;
-        int recombinationSize = Constants.RECOMBINATION_SIZE;
-        int mutationSize = Constants.MUTATION_SIZE;
-        int last_cycles_without_mutation = (eval_limit/Constants.POPULATION_SIZE)/10;
-        for (int i = 0; i < eval_limit/Constants.POPULATION_SIZE; i++) {
-            //System.out.print("Generation ");
-            //System.out.println(i);
 
-            // If we reach the last LAST_CYCLES_WITHOUT_MUTATION cycles, 
+        int populationSize = Constants.POPULATION_SIZE;
+        int initialFittestSize = Constants.FITTEST_SIZE;
+        int recombinationSize = Constants.RECOMBINATION_SIZE;
+        int initialMutationSize = Constants.MUTATION_SIZE;
+
+        String populationSizeString = System.getProperty("populationSize");
+        if (populationSizeString != null && !populationSizeString.isEmpty()) {
+            populationSize = Integer.parseInt(populationSizeString);
+        }
+
+        String fittestSizeString = System.getProperty("fittestSize");
+        if (fittestSizeString != null && !fittestSizeString.isEmpty()) {
+            initialFittestSize = Integer.parseInt(fittestSizeString);
+        }
+
+        String recombinationSizeString = System.getProperty("recombinationSize");
+        if (recombinationSizeString != null && !recombinationSizeString.isEmpty()) {
+            recombinationSize = Integer.parseInt(recombinationSizeString);
+        }
+
+        String mutationSizeString = System.getProperty("mutationSize");
+        if (mutationSizeString != null && !mutationSizeString.isEmpty()) {
+            initialMutationSize = Integer.parseInt(mutationSizeString);
+        }
+        
+        int cycles = eval_limit / populationSize;
+        int last_cycles_without_mutation = cycles / 20;
+        int fittestSize = initialFittestSize;
+        int mutationSize = initialMutationSize;
+
+        for (int i = 0; i < cycles; i++) {
+            // If we reach the last last_cycles_without_mutation cycles, 
             // we must stop mutating in order to preserve the currently found good population
-            if (eval_limit/Constants.POPULATION_SIZE - i < last_cycles_without_mutation) {
-                fittestSize = Constants.FITTEST_SIZE + Constants.MUTATION_SIZE;
+            if (cycles - i < last_cycles_without_mutation) {
+                fittestSize = initialFittestSize + mutationSize;
                 mutationSize = 0;
             }
-            //System.out.print("\nGENERATION ");
-            //System.out.println(i);
-            //System.out.println("EVALUATIONS");
-            //System.out.println(Constants.FITNESS_EVALUATIONS);
+
             tribe.recalculateFitness();
-            //tribe.print();
             Population nextGeneration = new Population(
                 Constants.CURRENT_MUTATION_TYPE,
                 Constants.CURRENT_PARENT_SELECTION_TYPE);

@@ -3,11 +3,10 @@ import java.util.Random;
 import java.util.Properties;
 
 /*
-javac -cp .\contest.jar player65.java ArrayHelper.java BaseIndividual.java BinaryIndividual.java BinaryMutation.java Constants.java DoubleIndividual.java DoubleMutation.java Evolution.java GenotypeRepresentation.java Main.java MathHelper.java MutationsHelper.java MutationType.java ParentSelectionType.java PhenotypeRepresentation.java Population.java
-
-jar cmf MainClass.txt submission.jar player65.class ArrayHelper.class BaseIndividual.class BinaryIndividual.class BinaryMutation.class Constants.class DoubleIndividual.class DoubleMutation.class Evolution.class GenotypeRepresentation.class Main.class MathHelper.class MutationsHelper.class MutationType.class ParentSelectionType.class PhenotypeRepresentation.class Population.class '.\Population$1.class' '.\MutationsHelper$1.class'
-
-jar uf contest.jar player65.class ArrayHelper.class BaseIndividual.class BinaryIndividual.class BinaryMutation.class Constants.class DoubleIndividual.class DoubleMutation.class Evolution.class GenotypeRepresentation.class Main.class MathHelper.class MutationsHelper.class MutationType.class ParentSelectionType.class PhenotypeRepresentation.class Population.class '.\Population$1.class' '.\MutationsHelper$1.class'
+javac -cp .\contest.jar player65.java *.java
+jar cmf MainClass.txt submission.jar player65.class *.class
+jar uf contest.jar player65.class *.class
+java -jar testrun.jar -submission=player65 -evaluation=BentCigarFunction -seed=1
 */
 
 public class player65 implements ContestSubmission
@@ -51,24 +50,6 @@ public class player65 implements ContestSubmission
     }
     
 	public void run() {
-		// Run your algorithm here
-		/*
-        int evals = 0;
-        // init population
-        // calculate fitness
-        while(evals<evaluations_limit_){
-            // Select parents
-            // Apply crossover / mutation operators
-            double child[] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-            // Check fitness of unknown fuction
-            Double fitness = (double) evaluation_.evaluate(child);
-            evals++;
-            // Select survivors
-        }
-		*/
-
-        //OUR STUFF
 		Evolution.startEvolutionaryAlgorithm(this.evaluation_, evaluations_limit_);
-
 	}
 }
