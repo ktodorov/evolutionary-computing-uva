@@ -8,16 +8,19 @@ public class Population {
     private ParentSelectionType parentSelectionType;
     private double[] mean;
     private double[] standardDeviation;
+    private int populationSize;
 
     public Population(
         MutationType mutationType, 
         ParentSelectionType parentSelectionType,
         PhenotypeRepresentation phenotypeRepresentation,
-        GenotypeRepresentation genotypeRepresentation) {
+        GenotypeRepresentation genotypeRepresentation,
+        int populationSize) {
 
         this.mutationType = mutationType;
         this.parentSelectionType = parentSelectionType;
-        this.people = new BaseIndividual[Constants.POPULATION_SIZE];
+        this.people = new BaseIndividual[populationSize];
+        this.populationSize = populationSize;
         this.initializeMeanAndVariance();
 
         // Initialize each individual
@@ -37,10 +40,12 @@ public class Population {
     }
     public Population(
         MutationType mutationType, 
-        ParentSelectionType parentSelectionType) {
+        ParentSelectionType parentSelectionType,
+        int populationSize) {
 
         this.mutationType = mutationType;
         this.parentSelectionType = parentSelectionType;
+        this.populationSize = populationSize;
         this.people = new BaseIndividual[0];
 
         this.initializeMeanAndVariance();
@@ -157,7 +162,7 @@ public class Population {
     // Note: No copies are added to the new population.
     // Beware of Individual.setEncoding for changes in #starter
     public void addIndividuals(BaseIndividual[] individualsToAdd){
-        if(this.people.length >= Constants.POPULATION_SIZE) {
+        if(this.people.length >= this.populationSize) {
             System.out.println("Population full. Abort");
         }
         else {

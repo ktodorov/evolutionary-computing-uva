@@ -4,11 +4,11 @@ public class Constants{
 
     public final static int DIMENSIONS = 10;
 
-    public final static int POPULATION_SIZE = 100;
+    public final static int POPULATION_SIZE = 90;
 
-    public final static int RECOMBINATION_SIZE = 60;
+    public final static int RECOMBINATION_SIZE = 70;
 
-    public final static int MUTATION_SIZE = 30;
+    public final static int MUTATION_SIZE = 16;
 
     public final static int FITTEST_SIZE = POPULATION_SIZE - RECOMBINATION_SIZE - MUTATION_SIZE;
 

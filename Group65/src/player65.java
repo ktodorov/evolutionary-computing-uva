@@ -7,6 +7,13 @@ javac -cp .\contest.jar player65.java *.java
 jar cmf MainClass.txt submission.jar player65.class *.class
 jar uf contest.jar player65.class *.class
 java -jar testrun.jar -submission=player65 -evaluation=BentCigarFunction -seed=1
+
+SphereEvaluation  best result - 11.10.2018:
+ - Score -  9.999944208243948
+ - Population size -  90
+ - Fittest size -  4
+ - Recombination size -  70
+ - Mutation size -  16
 */
 
 public class player65 implements ContestSubmission

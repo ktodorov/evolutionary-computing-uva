@@ -3,6 +3,7 @@ function InvokeFunction
     Param ([int]$populationSize, [int]$fittestSize, [int]$recombinationSize, [int]$mutationSize, [string]$function)
 
     $maxScore = 0
+    $minScore = -1
     $i = 0
     while ($i -lt 10)
     {
@@ -14,10 +15,15 @@ function InvokeFunction
         {
             $maxScore = $currentScore
         }
+
+        if ($minScore -gt $currentScore -or $minScore -lt 0){
+            $minScore = $currentScore
+        }
+
         $i++
     }
 
-    return $maxScore
+    return $maxScore, $minScore
 }
 
 function TuneFunction
@@ -34,7 +40,7 @@ function TuneFunction
     {
         For ($j = 0; $j -le $populationSize - $i; $j+=2)
         {
-            For ($k = 0; $k -le $populationSize - $i - $j; $k+=2)
+            For ($k = 0; $k -le $populationSize - $i - $j -and $k -le 30; $k+=2)
             {
                 Write-Host "invoking with fittest - " $i "; recombination - " $j "; mutation - " $k
                 $currentScore = InvokeFunction -populationSize $populationSize -fittestSize $i -recombinationSize $j -mutationSize $k -function $function
@@ -73,12 +79,15 @@ if (!([string]::IsNullOrEmpty($compilationOutput)))
 jar cmf MainClass.txt submission.jar player65.class *.class
 jar uf contest.jar player65.class *.class
 
-TuneFunction -function SphereEvaluation
-
+# TuneFunction -function SphereEvaluation
 # TuneFunction -function BentCigarFunction
 # TuneFunction -function KatsuuraEvaluation
 # TuneFunction -function SchaffersEvaluation
-# InvokeFunction -populationSize 100 -fittestSize 10 -recombinationSize 60 -mutationSize 30 -function SphereEvaluation
-# InvokeFunction -populationSize 100 -fittestSize 10 -recombinationSize 60 -mutationSize 30 -function BentCigarFunction
-# InvokeFunction -populationSize 100 -fittestSize 10 -recombinationSize 60 -mutationSize 30 -function KatsuuraEvaluation
-# InvokeFunction -populationSize 100 -fittestSize 10 -recombinationSize 60 -mutationSize 30 -function SchaffersEvaluation
+$maxScore, $minScore = & InvokeFunction -populationSize 90 -fittestSize 4 -recombinationSize 70 -mutationSize 16 -function SphereEvaluation 2>&1
+Write-Host "Sphere: min - " $minScore "| max - " $maxScore
+$maxScore, $minScore = & InvokeFunction -populationSize 90 -fittestSize 4 -recombinationSize 70 -mutationSize 16 -function BentCigarFunction 2>&1
+Write-Host "Bent cigar: min - " $minScore "| max - " $maxScore
+$maxScore, $minScore = & InvokeFunction -populationSize 90 -fittestSize 4 -recombinationSize 70 -mutationSize 16 -function SchaffersEvaluation 2>&1
+Write-Host "Schaffers: min - " $minScore "| max - " $maxScore
+$maxScore, $minScore = & InvokeFunction -populationSize 90 -fittestSize 4 -recombinationSize 70 -mutationSize 16 -function KatsuuraEvaluation 2>&1
+Write-Host "Katsuura: min - " $minScore "| max - " $maxScore

@@ -4,12 +4,6 @@ public class Evolution {
     public static ContestEvaluation eval;
     static void startEvolutionaryAlgorithm(ContestEvaluation evaluation, int eval_limit) {
         eval= evaluation;
-        
-        Population tribe = new Population(
-            Constants.CURRENT_MUTATION_TYPE,
-            Constants.CURRENT_PARENT_SELECTION_TYPE,
-            Constants.CURRENT_PHENOTYPE_REPRESENTATION,
-            Constants.CURRENT_GENOTYPE_REPRESENTATION);
 
         int populationSize = Constants.POPULATION_SIZE;
         int initialFittestSize = Constants.FITTEST_SIZE;
@@ -36,6 +30,14 @@ public class Evolution {
             initialMutationSize = Integer.parseInt(mutationSizeString);
         }
         
+        
+        Population tribe = new Population(
+            Constants.CURRENT_MUTATION_TYPE,
+            Constants.CURRENT_PARENT_SELECTION_TYPE,
+            Constants.CURRENT_PHENOTYPE_REPRESENTATION,
+            Constants.CURRENT_GENOTYPE_REPRESENTATION,
+            populationSize);
+
         int cycles = eval_limit / populationSize;
         int last_cycles_without_mutation = cycles / 20;
         int fittestSize = initialFittestSize;
@@ -52,7 +54,8 @@ public class Evolution {
             tribe.recalculateFitness();
             Population nextGeneration = new Population(
                 Constants.CURRENT_MUTATION_TYPE,
-                Constants.CURRENT_PARENT_SELECTION_TYPE);
+                Constants.CURRENT_PARENT_SELECTION_TYPE,
+                populationSize);
 
             // RECOMBINATION
             if (recombinationSize > 0) {
