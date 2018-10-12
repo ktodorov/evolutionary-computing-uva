@@ -1,5 +1,13 @@
 import org.vu.contest.ContestEvaluation;
 
+/**
+ * OPTIMIZATION FINDINGS:
+ * Evaluating fitness takes ages, but can't be optimized ->  Not our code! [50-60%]
+ * Recombination takes most of the remaining time [20-30%]
+ * Mutation is relatively easy [5-10%]
+ * The rest is negligible
+ */
+
 public class Evolution {
     public static ContestEvaluation eval;
     static void startEvolutionaryAlgorithm(ContestEvaluation evaluation, int eval_limit) {
@@ -30,50 +38,41 @@ public class Evolution {
             initialMutationSize = Integer.parseInt(mutationSizeString);
         }
         
-        
         Population tribe = new Population(
-            Constants.CURRENT_MUTATION_TYPE,
             Constants.CURRENT_PARENT_SELECTION_TYPE,
-            Constants.CURRENT_PHENOTYPE_REPRESENTATION,
-            Constants.CURRENT_GENOTYPE_REPRESENTATION,
             populationSize);
 
         int cycles = eval_limit / populationSize;
         int last_cycles_without_mutation = cycles / 20; // 5 %
         int fittestSize = initialFittestSize;
         int mutationSize = initialMutationSize;
-
         for (int i = 0; i < cycles; i++) {
-            //System.out.print("GENERATION ");
-            //System.out.println(i);
             // If we reach the last last_cycles_without_mutation cycles, 
             // we must stop mutating in order to preserve the currently found good population
             if (cycles - i < last_cycles_without_mutation) {
                 fittestSize = initialFittestSize + mutationSize;
                 mutationSize = 0;
             }
-
             tribe.recalculateFitness();
+
             Population nextGeneration = new Population(
-                Constants.CURRENT_MUTATION_TYPE,
                 Constants.CURRENT_PARENT_SELECTION_TYPE,
                 populationSize);
+            nextGeneration.clearPopulation();
 
             // RECOMBINATION
-            if (recombinationSize > 0) {
-                BaseIndividual[] newChildren = tribe.createNewChildren(recombinationSize);
-                nextGeneration.addIndividuals(newChildren);
-            }
+            DoubleIndividual[] newChildren = tribe.createNewChildren(recombinationSize);
+            nextGeneration.addIndividuals(newChildren);
+
 
             // MUTATION
             if (mutationSize > 0) {
-                BaseIndividual[] mutatedChildren = tribe.mutateIndividualsByDouble(mutationSize);
+                DoubleIndividual[] mutatedChildren = tribe.mutateIndividualsByDouble(mutationSize);
                 nextGeneration.addIndividuals(mutatedChildren);
             }
 
-            BaseIndividual[] fittestIndividuals = tribe.getTopIndividuals(fittestSize);
+            DoubleIndividual[] fittestIndividuals = tribe.getTopIndividuals(fittestSize);
             nextGeneration.addIndividuals(fittestIndividuals);
-
             tribe = nextGeneration;
         }
     }

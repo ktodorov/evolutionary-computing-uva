@@ -1,23 +1,18 @@
-public class DoubleIndividual extends BaseIndividual {
+public class DoubleIndividual {
     public double[] phenotype;
     public double[] genotype;
     private double probabilities;
-    
+    private double fitness;
+
     public DoubleIndividual() {
         this.phenotype = new double[10];
         this.genotype = new double[10];
         this.probabilities = 0;
-        this.fitness = -1;
 
         for (int i = 0; i < 10; i++) {
-            this.phenotype[i] = (Math.random() * Constants.DIMENSIONS) - 5; //Randomly distributed between [-5, 5]
-            this.genotype[i] = this.phenotype[i];
+            this.genotype[i] = (Math.random() * Constants.DIMENSIONS) - 5; //Randomly distributed between [-5, 5]
+            this.phenotype[i] = this.genotype[i];
         }
-    }
-
-    public static DoubleIndividual[] createNewChildren(DoubleIndividual firstParent, DoubleIndividual secondParent) {
-        // return recombineIndividualsByWholeArithmetic(firstParent, secondParent);
-        return recombineIndividualBySwappingTails(firstParent, secondParent);
     }
 
     public static DoubleIndividual[] recombineIndividualsByWholeArithmetic(DoubleIndividual firstParent, DoubleIndividual secondParent) {
@@ -73,16 +68,6 @@ public class DoubleIndividual extends BaseIndividual {
         return result;
     }
 
-
-    public void mutate(MutationType mutationType) {
-        /*
-        int i = (int) Math.random() * 9;
-        this.genotype[i] = MutationsHelper.mutateByType(this.genotype[i], mutationType);
-        this.phenotype[i] = this.genotype[i];
-        */
-        System.out.println("this is currently not in use.");
-    }
-
     public void print(){
         System.out.print("FITNESS:");
         System.out.println(this.fitness);
@@ -94,9 +79,6 @@ public class DoubleIndividual extends BaseIndividual {
     public double getProbabilities(){
         return this.probabilities;
     }
-    public double[] getPhenotypeDouble(){
-        return this.phenotype;
-    }
     public void setGenotypeDouble(double[] a){
         this.genotype = a;
         this.phenotype = this.genotype;
@@ -105,15 +87,39 @@ public class DoubleIndividual extends BaseIndividual {
         return this.genotype;
     }
 
+    public boolean containsNaN(){
+        for (int i = 0; i < this.genotype.length-1; i++) {
+            if(Double.isNaN(genotype[i])){
+                return true;
+            }
+        }
+        return false;
+    }
 
+    public void printGenotype(){
+        System.out.print("[");
+        for (int i = 0; i < this.genotype.length-1; i++) {
+            System.out.print(this.genotype[i]);
+            System.out.print(", ");
+        }
+        System.out.print(this.genotype[9]);
+        System.out.println("]");
+    }
+
+    public double getFitness(){
+        return this.fitness;
+    }
     public static int counter = 0;
 
     protected double calculateFitness(boolean skipIfAlreadyCalculated) {
         Constants.FITNESS_EVALUATIONS++; //Easier to track evaluations during testing
         this.fitness = (double) Evolution.eval.evaluate(this.genotype);
-        this.fitness = Double.isNaN(this.fitness) ? -1 : this.fitness;
-        //System.out.println(Constants.FITNESS_EVALUATIONS);
-        //System.out.println(this.fitness);
+        this.fitness = Double.isNaN(this.fitness) ? -42 : this.fitness;
+        if(this.fitness == -42){
+            //System.out.println(this.containsNaN());
+            //this.printGenotype();
+            System.out.println("Some Genotype is f****d");
+        }
         return this.fitness;
     }
 }

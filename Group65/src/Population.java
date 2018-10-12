@@ -1,32 +1,31 @@
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 
 public class Population {
-    private BaseIndividual[] people;
-    private MutationType mutationType;
+    private DoubleIndividual[] people;
     private ParentSelectionType parentSelectionType;
     private double[] mean;
     private double[] standardDeviation;
     private int populationSize;
 
     public Population(
-        MutationType mutationType, 
         ParentSelectionType parentSelectionType,
-        PhenotypeRepresentation phenotypeRepresentation,
-        GenotypeRepresentation genotypeRepresentation,
         int populationSize) {
 
-        this.mutationType = mutationType;
         this.parentSelectionType = parentSelectionType;
-        this.people = new BaseIndividual[populationSize];
+        this.people = new DoubleIndividual[populationSize];
         this.populationSize = populationSize;
         this.initializeMeanAndVariance();
 
         // Initialize each individual
         for (int i = 0; i < this.people.length; i++) {
-            this.people[i] = BaseIndividual.createIndividualForRepresentation(phenotypeRepresentation, genotypeRepresentation);
+            this.people[i] = new DoubleIndividual();
         }
+    }
+    public void clearPopulation(){
+        this.people = new DoubleIndividual[0];
     }
 
     public void initializeMeanAndVariance(){
@@ -38,36 +37,22 @@ public class Population {
             this.standardDeviation[i] = 0;
         }
     }
-    public Population(
-        MutationType mutationType, 
-        ParentSelectionType parentSelectionType,
-        int populationSize) {
-
-        this.mutationType = mutationType;
-        this.parentSelectionType = parentSelectionType;
-        this.populationSize = populationSize;
-        this.people = new BaseIndividual[0];
-
-        this.initializeMeanAndVariance();
-    }
 
     public Population(
-        MutationType mutationType, 
         ParentSelectionType parentSelectionType,
-        BaseIndividual[] individuals) {
+        DoubleIndividual[] individuals) {
 
-        this.mutationType = mutationType;
         this.parentSelectionType = parentSelectionType;
-        this.people = new BaseIndividual[0];
+        this.people = new DoubleIndividual[0];
         this.addIndividuals(individuals);
     }
 
-    public BaseIndividual[] getPeople() {
+    public DoubleIndividual[] getPeople() {
         return this.people;
     }
 
-    public BaseIndividual[] getRandomIndividuals(int count) {
-        BaseIndividual[] randomIndividuals = new BaseIndividual[count];
+    public DoubleIndividual[] getRandomIndividuals(int count) {
+        DoubleIndividual[] randomIndividuals = new DoubleIndividual[count];
         for (int k = 0; k < randomIndividuals.length; k++) {
             randomIndividuals[k] = this.people[(int)(Math.random()*this.people.length)];
         }
@@ -75,17 +60,11 @@ public class Population {
         return randomIndividuals;
     }
 
-    public void recalculateFitness() {
-        for (BaseIndividual individual : this.people) {
-            individual.calculateFitness(true);
-        }
-    }
+    public DoubleIndividual[] getTopIndividuals(int count) {
+        DoubleIndividual[] fittest = new DoubleIndividual[count];
 
-    public BaseIndividual[] getTopIndividuals(int count) {
-        BaseIndividual[] fittest = new BaseIndividual[count];
-
-        this.sortPeopleByFitness();
-
+        this.sortPeopleByFitnessAscending();
+        Collections.reverse(Arrays.asList(this.people));
         // get the N fittest people
         for (int i = 0; i < count; i++) {
             fittest[i] = this.people[i];
@@ -94,14 +73,14 @@ public class Population {
         return fittest;
     }
 
-    public BaseIndividual[] createNewChildren(int count) {
-        BaseIndividual[] parents = this.selectParents(count);
+    public DoubleIndividual[] createNewChildren(int count) {
+        DoubleIndividual[] parents = this.selectParents(count);
         return recombine(parents);
     }
 
-    public BaseIndividual[] mutateIndividualsByDouble(int count) {
-        BaseIndividual[] individualsForMutation = this.getTopIndividuals(count);
-        //BaseIndividual[] individualsForMutation = this.getRandomIndividuals(count);
+    public DoubleIndividual[] mutateIndividualsByDouble(int count) {
+        DoubleIndividual[] individualsForMutation = this.getTopIndividuals(count);
+        //DoubleIndividual[] individualsForMutation = this.getRandomIndividuals(count);
 
         //Initialize some variables
         this.initializeMeanAndVariance();
@@ -120,11 +99,15 @@ public class Population {
                 this.mean[j] += this.people[i].getGenotypeDouble()[j];
             }
             this.mean[j] /= this.people.length;
+
             for (int p = 0; p < this.people.length; p++) {
-                this.standardDeviation[j] += Math.pow(this.people[p].getGenotypeDouble()[j], 2);
+                this.standardDeviation[j] += Math.pow(this.people[p].getGenotypeDouble()[j] - this.mean[j], 2);
             }
-            this.standardDeviation[j] /= this.people.length;
-            this.standardDeviation[j] -= Math.pow(this.mean[j], 2);
+            this.standardDeviation[j] /= this.people.length-1;
+            //this.standardDeviation[j] -= Math.pow(this.mean[j], 2);
+            if(this.standardDeviation[j] < 0){
+                System.out.print("SD ");
+            }
             this.standardDeviation[j] = Math.sqrt(this.standardDeviation[j]);
             this.standardDeviation[j] = this.standardDeviation[j] * Math.exp(t1 * constantGaussian + t2 * changingGauss[j]);
         }
@@ -135,20 +118,26 @@ public class Population {
             for (int j = 0; j < Constants.DIMENSIONS; j++) {
                 newGenotype[j] = individualsForMutation[k].getGenotypeDouble()[j] + this.standardDeviation[j] * changingGauss[j];
             }
+            if(individualsForMutation[k].containsNaN()){
+                System.out.println("before");
+            }
             individualsForMutation[k].setGenotypeDouble(newGenotype);
+            if(individualsForMutation[k].containsNaN()){
+                System.out.println("after");
+            }
         }
         return individualsForMutation;
     }
 
     // Note: No copies are added to the new population.
     // Beware of Individual.setEncoding for changes in #starter
-    public void addIndividuals(BaseIndividual[] individualsToAdd){
+    public void addIndividuals(DoubleIndividual[] individualsToAdd){
         if(this.people.length >= this.populationSize) {
             System.out.println("Population full. Abort");
         }
         else {
             int newSize = this.people.length + individualsToAdd.length;
-            BaseIndividual[] buffer = new BaseIndividual[newSize];
+            DoubleIndividual[] buffer = new DoubleIndividual[newSize];
 
             System.arraycopy(this.people, 0, buffer, 0, this.people.length);
             System.arraycopy(individualsToAdd, 0, buffer, this.people.length, newSize-this.people.length);
@@ -157,35 +146,24 @@ public class Population {
     }
 
     public void print() {
-        this.sortPeopleByFitness();
-        for (BaseIndividual individual : this.people) {
+        for (DoubleIndividual individual : this.people) {
             System.out.print(" ");
             individual.print();
         }
     }
 
-    public void printStats() {
-        double overallFitness = this.calculateOverallFitness();
-        System.out.println("Overall population fitness: " + overallFitness);
-
-        this.sortPeopleByFitness();
-        System.out.println("Highest individual fitness: " + this.people[0].getFitness());
-
-        System.out.println("Average individual fitness: " + overallFitness / this.people.length);
-    }
-
     private void createProbabilitiesBasedOnRank(){
-        sortPeopleByFitnessReversed();
-        double c = 0.55;
+        sortPeopleByFitnessAscending();
+        double c = Constants.K_FOR_RANKED_BASED_PROBABILITIES;
         for (int i = 0; i < this.people.length; i++) {
             this.people[i].setProbabilities(Math.pow(c, this.people.length-1-i)*(c-1) / (Math.pow(c, this.people.length)-1));
         }
     }
 
-    private BaseIndividual[] selectParentsbyTournament(int count){
+    private DoubleIndividual[] selectParentsbyTournament(int count){
         //System.out.println("SELECT PARENTS BY TOURNAMENT");
-        BaseIndividual[] parents = new BaseIndividual[count];
-        BaseIndividual[] peopleCopy = ArrayHelper.copyArray(this.people);
+        DoubleIndividual[] parents = new DoubleIndividual[count];
+        DoubleIndividual[] peopleCopy = ArrayHelper.copyArray(this.people);
         for (int k = 0; k < count; k++) {
             int pick1 = (int) (Math.random()*peopleCopy.length);
             int pick2 = (int) (Math.random()*peopleCopy.length);
@@ -209,34 +187,33 @@ public class Population {
                 System.out.println("Not assigned");
             }
 
-            parents[k].print();
+            //parents[k].print();
         }
 
         return parents;
     }
 
-    private BaseIndividual[] selectParentsByRouletteWheel(int count) {
+    private DoubleIndividual[] selectParentsByRouletteWheel(int count) {
         // initialize new array for parents
-        BaseIndividual[] parents = new BaseIndividual[count];
+        DoubleIndividual[] parents = new DoubleIndividual[count];
 
-        // sort the people
-        createProbabilitiesBasedOnRank();
-        sortPeopleByFitness();
-        BaseIndividual[] peopleCopy = ArrayHelper.copyArray(this.people);
-
+        // create probabilities for rank based roulette and sort the people in descending order
+        this.createProbabilitiesBasedOnRank();
+        DoubleIndividual[] peopleCopy = ArrayHelper.copyArray(this.people);
         double overallFitness = this.calculateOverallFitness();
-
         int currentMember = 0;
+        double r;
+        int k;
         while (currentMember < count){
-            double r = Math.random();
-            int k = 0;
+            r = Math.random();
+            k = 0;
             double cumulativeProb = 0;
-            while(cumulativeProb < r && k >= peopleCopy.length){
+            while(cumulativeProb < r && k < peopleCopy.length){
                 //new rank based probabilities
                 double personProbability = peopleCopy[k].getProbabilities();
 
                 //old fitness based probabilities
-                //double personProbability = this.people[k].getFitness() / overallFitness;
+                //double personProbability = peopleCopy[k].getFitness() / overallFitness;
 
                 cumulativeProb += personProbability;
                 k++;
@@ -252,14 +229,16 @@ public class Population {
             // prevent choosing Individuals twice
             overallFitness -= peopleCopy[k].getFitness();
             peopleCopy = ArrayHelper.removeElementFromArray(peopleCopy, k);
-            
             currentMember++;
         }
+        //System.out.print("Roulette-While took: ");
+        //System.out.print((System.nanoTime()-time1));
+        //System.out.println("nanos.");
 
         return parents;
     }
 
-    private BaseIndividual[] selectParents(int count) {
+    private DoubleIndividual[] selectParents(int count) {
         switch (this.parentSelectionType){
             case RANDOM:
                 return getRandomIndividuals(count);
@@ -272,13 +251,13 @@ public class Population {
         return null;
     }
 
-    private BaseIndividual[] recombine(BaseIndividual[] parents) {
+    private DoubleIndividual[] recombine(DoubleIndividual[] parents) {
         //TODO which parents mate with each other? neighborhood relation on sorted or randomly shuffled array?
         ArrayHelper.shuffleArray(parents);
-        BaseIndividual[] children = new BaseIndividual[parents.length];
+        DoubleIndividual[] children = new DoubleIndividual[parents.length];
         for (int k = 0; k < parents.length - 1; k+=2) {
             //DoubleIndividual[] newChildren = DoubleIndividual.recombineIndividualsByWholeArithmetic((DoubleIndividual) parents[k], (DoubleIndividual) parents[k + 1]);
-            DoubleIndividual[] newChildren = DoubleIndividual.recombineIndividualBySwappingTails((DoubleIndividual) parents[k], (DoubleIndividual) parents[k + 1]);
+            DoubleIndividual[] newChildren = DoubleIndividual.recombineIndividualBySwappingTails(parents[k], parents[k + 1]);
             children[k] = newChildren[0];
             children[k+1] = newChildren[1];
         }
@@ -286,20 +265,26 @@ public class Population {
         return children;
     }
 
+    public void recalculateFitness() {
+        for (DoubleIndividual individual : this.people) {
+            individual.calculateFitness(true);
+        }
+    }
+
     // Calculate the sum over all individuals' fitnesses
     private double calculateOverallFitness(){
         double result = 0;
-        for (BaseIndividual individual : this.people) {
+        for (DoubleIndividual individual : this.people) {
             result += individual.getFitness();
         }
 
         return result;
     }
 
-    private void sortPeopleByFitness(){
-        Arrays.sort(this.people, Comparator.comparingDouble(BaseIndividual::getFitness).reversed());
+    private void sortPeopleByFitnessAscending(){
+       Arrays.sort(this.people, Comparator.comparingDouble(DoubleIndividual::getFitness));
     }
-    private void sortPeopleByFitnessReversed(){
-        Arrays.sort(this.people, Comparator.comparingDouble(BaseIndividual::getFitness));
-    }
+    //private void sortPeopleByFitnessDescending(){
+    //    Arrays.sort(this.people, Comparator.comparingDouble(DoubleIndividual::getFitness).reversed());
+    //}
 }
