@@ -3,7 +3,8 @@ import java.util.Random;
 import java.util.Properties;
 
 /*
-javac -cp .\contest.jar player65.java *.java
+export LD_LIBRARY_PATH=~/IdeaProjects/evolutionary-computing-uva/Group65/src/
+javac -cp contest.jar player65.java *.java
 jar cmf MainClass.txt submission.jar player65.class *.class
 jar uf contest.jar player65.class *.class
 java -jar testrun.jar -submission=player65 -evaluation=BentCigarFunction -seed=1

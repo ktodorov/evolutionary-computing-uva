@@ -12,8 +12,6 @@ public class Constants{
 
     public final static int FITTEST_SIZE = POPULATION_SIZE - RECOMBINATION_SIZE - MUTATION_SIZE;
 
-    public final static int CYCLES_SIZE = 200;
-
     public final static MutationType CURRENT_MUTATION_TYPE = MutationType.DOUBLE;
 
     public final static ParentSelectionType CURRENT_PARENT_SELECTION_TYPE = ParentSelectionType.ROULETTE_WHEEL;

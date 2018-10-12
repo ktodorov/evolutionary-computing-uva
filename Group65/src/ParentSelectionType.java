@@ -1,4 +1,5 @@
 public enum ParentSelectionType{
     RANDOM,
-    ROULETTE_WHEEL
+    ROULETTE_WHEEL,
+    TOURNAMENT
 }

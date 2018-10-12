@@ -115,9 +115,13 @@ public class DoubleIndividual extends BaseIndividual {
 
 
     public static int counter = 0;
+
     protected double calculateFitness(boolean skipIfAlreadyCalculated) {
         Constants.FITNESS_EVALUATIONS++; //Easier to track evaluations during testing
         this.fitness = (double) Evolution.eval.evaluate(this.genotype);
+        this.fitness = Double.isNaN(this.fitness) ? -1 : this.fitness;
+        //System.out.println(Constants.FITNESS_EVALUATIONS);
+        //System.out.println(this.fitness);
         return this.fitness;
     }
 }

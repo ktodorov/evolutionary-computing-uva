@@ -39,11 +39,13 @@ public class Evolution {
             populationSize);
 
         int cycles = eval_limit / populationSize;
-        int last_cycles_without_mutation = cycles / 20;
+        int last_cycles_without_mutation = cycles / 20; // 5 %
         int fittestSize = initialFittestSize;
         int mutationSize = initialMutationSize;
 
         for (int i = 0; i < cycles; i++) {
+            //System.out.print("GENERATION ");
+            //System.out.println(i);
             // If we reach the last last_cycles_without_mutation cycles, 
             // we must stop mutating in order to preserve the currently found good population
             if (cycles - i < last_cycles_without_mutation) {

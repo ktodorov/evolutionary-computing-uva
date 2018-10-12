@@ -100,9 +100,8 @@ public class Population {
     }
 
     public BaseIndividual[] mutateIndividualsByDouble(int count) {
-        // Currently randomly select from population
-        BaseIndividual[] individualsForMutation = this.getRandomIndividuals(count);
-        //System.out.println("NEW ROUND OF MUTATION\n");
+        BaseIndividual[] individualsForMutation = this.getTopIndividuals(count);
+        //BaseIndividual[] individualsForMutation = this.getRandomIndividuals(count);
 
         //Initialize some variables
         this.initializeMeanAndVariance();
@@ -117,8 +116,6 @@ public class Population {
 
         //Find Standard Deviation
         for (int j = 0; j < Constants.DIMENSIONS; j++) {
-            //System.out.print("DIMENSION ");
-            //System.out.println(j);
             for (int i = 0; i < this.people.length; i++) {
                 this.mean[j] += this.people[i].getGenotypeDouble()[j];
             }
@@ -130,26 +127,14 @@ public class Population {
             this.standardDeviation[j] -= Math.pow(this.mean[j], 2);
             this.standardDeviation[j] = Math.sqrt(this.standardDeviation[j]);
             this.standardDeviation[j] = this.standardDeviation[j] * Math.exp(t1 * constantGaussian + t2 * changingGauss[j]);
-            //System.out.println("\nMEAN");
-            //System.out.println(this.mean[j]);
-            //System.out.println("\nStandard Deviation");
-            //System.out.println(this.standardDeviation[j]);
         }
 
         //Mutate
-        //System.out.println("GENOTYPES");
         for (int k = 0; k < individualsForMutation.length; k++) {
             double[] newGenotype = new double[10];
             for (int j = 0; j < Constants.DIMENSIONS; j++) {
                 newGenotype[j] = individualsForMutation[k].getGenotypeDouble()[j] + this.standardDeviation[j] * changingGauss[j];
-                //System.out.println("OLD");
-                //System.out.println(individualsForMutation[k].getGenotypeDouble()[j]);
-                //System.out.println("NEW");
-                //System.out.println(newGenotype[j]);
-                //System.out.print(newGenotype[j]);
-                //System.out.println(", ");
             }
-
             individualsForMutation[k].setGenotypeDouble(newGenotype);
         }
         return individualsForMutation;
@@ -201,6 +186,39 @@ public class Population {
         }
     }
 
+    private BaseIndividual[] selectParentsbyTournament(int count){
+        //System.out.println("SELECT PARENTS BY TOURNAMENT");
+        BaseIndividual[] parents = new BaseIndividual[count];
+        BaseIndividual[] peopleCopy = ArrayHelper.copyArray(this.people);
+        for (int k = 0; k < count; k++) {
+            int pick1 = (int) (Math.random()*peopleCopy.length);
+            int pick2 = (int) (Math.random()*peopleCopy.length);
+            int pick3 = (int) (Math.random()*peopleCopy.length);
+            System.out.println(peopleCopy[pick1].getFitness());
+            System.out.println(peopleCopy[pick2].getFitness());
+            System.out.println(peopleCopy[pick3].getFitness());
+            if(peopleCopy[pick1].getFitness() >= peopleCopy[pick2].getFitness() && peopleCopy[pick1].getFitness() >= peopleCopy[pick3].getFitness()) {
+                parents[k] = peopleCopy[pick1];
+                peopleCopy = ArrayHelper.removeElementFromArray(peopleCopy, pick1);
+            }
+            else if(peopleCopy[pick2].getFitness() >= peopleCopy[pick1].getFitness() && peopleCopy[pick2].getFitness() >= peopleCopy[pick3].getFitness()) {
+                parents[k] = peopleCopy[pick2];
+                peopleCopy = ArrayHelper.removeElementFromArray(peopleCopy, pick2);
+            }
+            else if(peopleCopy[pick3].getFitness() >= peopleCopy[pick1].getFitness() && peopleCopy[pick3].getFitness() >= peopleCopy[pick2].getFitness()) {
+                parents[k] = peopleCopy[pick3];
+                peopleCopy = ArrayHelper.removeElementFromArray(peopleCopy, pick3);
+            }
+            if(parents[k] == null){
+                System.out.println("Not assigned");
+            }
+
+            parents[k].print();
+        }
+
+        return parents;
+    }
+
     private BaseIndividual[] selectParentsByRouletteWheel(int count) {
         // initialize new array for parents
         BaseIndividual[] parents = new BaseIndividual[count];
@@ -223,10 +241,10 @@ public class Population {
             double cumulativeProb = 0;
             while(cumulativeProb < r && k >= peopleCopy.length){
                 //new rank based probabilities
-                //double personProbability = peopleCopy[k].getProbabilities();
+                double personProbability = peopleCopy[k].getProbabilities();
 
                 //old fitness based probabilities
-                double personProbability = this.people[k].getFitness() / overallFitness;
+                //double personProbability = this.people[k].getFitness() / overallFitness;
 
                 cumulativeProb += personProbability;
                 k++;
@@ -255,6 +273,8 @@ public class Population {
                 return getRandomIndividuals(count);
             case ROULETTE_WHEEL:
                 return selectParentsByRouletteWheel(count);
+            case TOURNAMENT:
+                return selectParentsbyTournament(count);
         }
 
         return null;
