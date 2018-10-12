@@ -83,15 +83,7 @@ public class DoubleIndividual extends BaseIndividual {
         System.out.println("this is currently not in use.");
     }
 
-    //Messy for 10 dimensions
-
     public void print(){
-        /*System.out.print("[");
-        for (int i = 0; i < 10; i++) {
-            System.out.print(this.genotype[i]);
-        }
-        System.out.println("]");*/
-
         System.out.print("FITNESS:");
         System.out.println(this.fitness);
     }

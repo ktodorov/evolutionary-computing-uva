@@ -140,10 +140,6 @@ public class Population {
         return individualsForMutation;
     }
 
-    public BaseIndividual[] getWorstIndividuals() {
-        return null;
-    }
-
     // Note: No copies are added to the new population.
     // Beware of Individual.setEncoding for changes in #starter
     public void addIndividuals(BaseIndividual[] individualsToAdd){
@@ -222,10 +218,6 @@ public class Population {
     private BaseIndividual[] selectParentsByRouletteWheel(int count) {
         // initialize new array for parents
         BaseIndividual[] parents = new BaseIndividual[count];
-        // for (int b = 0; b < parents.length; b++) {
-        //     // dummy values
-        //     parents[b] = new BaseIndividual(0);
-        // }
 
         // sort the people
         createProbabilitiesBasedOnRank();
@@ -281,8 +273,8 @@ public class Population {
     }
 
     private BaseIndividual[] recombine(BaseIndividual[] parents) {
-        //TODO which parents mate with each other? Currently neighborhood relation!
-        //1 with 2,  3 with 4, ...
+        //TODO which parents mate with each other? neighborhood relation on sorted or randomly shuffled array?
+        ArrayHelper.shuffleArray(parents);
         BaseIndividual[] children = new BaseIndividual[parents.length];
         for (int k = 0; k < parents.length - 1; k+=2) {
             //DoubleIndividual[] newChildren = DoubleIndividual.recombineIndividualsByWholeArithmetic((DoubleIndividual) parents[k], (DoubleIndividual) parents[k + 1]);

@@ -1,4 +1,5 @@
 import java.lang.reflect.Array;
+import java.util.Random;
 
 public class ArrayHelper {
     public static <T> T[] removeElementFromArray(T[] array, int index){
@@ -17,5 +18,18 @@ public class ArrayHelper {
 
     public static <T> T[] copyArray(T[] array) {
         return array.clone();
+    }
+
+    public static <T> T[] shuffleArray(T[] array){
+        Random rnd = new Random();
+        for (int i = array.length - 1; i > 0; i--)
+        {
+            int index = rnd.nextInt(i + 1);
+            // Simple swap
+            T objectToSwap = array[index];
+            array[index] = array[i];
+            array[i] = objectToSwap;
+        }
+        return array;
     }
 }
