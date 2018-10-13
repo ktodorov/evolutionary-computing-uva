@@ -15,7 +15,7 @@ public class Evolution {
 
         int populationSize = Constants.POPULATION_SIZE;
         int initialFittestSize = Constants.FITTEST_SIZE;
-        int recombinationSize = Constants.RECOMBINATION_SIZE;
+        int initialRecombinationSize = Constants.RECOMBINATION_SIZE;
         int initialMutationSize = Constants.MUTATION_SIZE;
 
         String populationSizeString = System.getProperty("populationSize");
@@ -30,7 +30,7 @@ public class Evolution {
 
         String recombinationSizeString = System.getProperty("recombinationSize");
         if (recombinationSizeString != null && !recombinationSizeString.isEmpty()) {
-            recombinationSize = Integer.parseInt(recombinationSizeString);
+            initialRecombinationSize = Integer.parseInt(recombinationSizeString);
         }
 
         String mutationSizeString = System.getProperty("mutationSize");
@@ -41,18 +41,26 @@ public class Evolution {
         Population tribe = new Population(
             Constants.CURRENT_PARENT_SELECTION_TYPE,
             populationSize);
-
+        
         int cycles = eval_limit / populationSize;
-        int last_cycles_without_mutation = cycles / 20; // 5 %
+        int last_cycles_without_mutation = cycles / 20;
         int fittestSize = initialFittestSize;
         int mutationSize = initialMutationSize;
+        int recombinationSize = initialRecombinationSize;
         for (int i = 0; i < cycles; i++) {
             // If we reach the last last_cycles_without_mutation cycles, 
             // we must stop mutating in order to preserve the currently found good population
             if (cycles - i < last_cycles_without_mutation) {
-                fittestSize = initialFittestSize + mutationSize;
-                mutationSize = 0;
+                if (fittestSize > 0) {
+                    fittestSize = initialFittestSize + mutationSize;
+                    mutationSize = 0;
+                }
+                else {
+                    recombinationSize = initialRecombinationSize + mutationSize;
+                    mutationSize = 0;
+                }
             }
+
             tribe.recalculateFitness();
 
             Population nextGeneration = new Population(
@@ -64,15 +72,17 @@ public class Evolution {
             DoubleIndividual[] newChildren = tribe.createNewChildren(recombinationSize);
             nextGeneration.addIndividuals(newChildren);
 
-
             // MUTATION
             if (mutationSize > 0) {
                 DoubleIndividual[] mutatedChildren = tribe.mutateIndividualsByDouble(mutationSize);
                 nextGeneration.addIndividuals(mutatedChildren);
             }
 
-            DoubleIndividual[] fittestIndividuals = tribe.getTopIndividuals(fittestSize);
-            nextGeneration.addIndividuals(fittestIndividuals);
+            if (fittestSize > 0) {
+                DoubleIndividual[] fittestIndividuals = tribe.getTopIndividuals(fittestSize);
+                nextGeneration.addIndividuals(fittestIndividuals);
+            }
+
             tribe = nextGeneration;
         }
     }

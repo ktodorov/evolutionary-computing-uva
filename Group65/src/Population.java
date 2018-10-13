@@ -44,6 +44,7 @@ public class Population {
 
         this.parentSelectionType = parentSelectionType;
         this.people = new DoubleIndividual[0];
+        this.populationSize = individuals.length;
         this.addIndividuals(individuals);
     }
 
