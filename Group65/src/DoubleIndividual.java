@@ -8,7 +8,9 @@ public class DoubleIndividual {
         this.phenotype = new double[10];
         this.genotype = new double[10];
         this.probabilities = 0;
-
+        this.initRandomGenotype();
+    }
+    private void initRandomGenotype(){
         for (int i = 0; i < 10; i++) {
             this.genotype[i] = (Math.random() * Constants.DIMENSIONS) - 5; //Randomly distributed between [-5, 5]
             this.phenotype[i] = this.genotype[i];
@@ -111,14 +113,13 @@ public class DoubleIndividual {
     }
     public static int counter = 0;
 
-    protected double calculateFitness(boolean skipIfAlreadyCalculated) {
-        Constants.FITNESS_EVALUATIONS++; //Easier to track evaluations during testing
+    protected double calculateFitness() {
+        Evolution.FITNESS_EVALUATIONS++; //Easier to track evaluations during testing
         this.fitness = (double) Evolution.eval.evaluate(this.genotype);
         this.fitness = Double.isNaN(this.fitness) ? -42 : this.fitness;
         if(this.fitness == -42){
-            //System.out.println(this.containsNaN());
-            //this.printGenotype();
-            System.out.println("Some Genotype is f****d");
+            //this.initRandomGenotype();
+            //System.out.println("Some Genotype is null.");
         }
         return this.fitness;
     }

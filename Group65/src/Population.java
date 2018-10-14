@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.Random;
 
 public class Population {
+    private double highestFitness;
     private DoubleIndividual[] people;
     private ParentSelectionType parentSelectionType;
     private double[] mean;
@@ -52,36 +53,14 @@ public class Population {
         return this.people;
     }
 
-    public DoubleIndividual[] getRandomIndividuals(int count) {
-        DoubleIndividual[] randomIndividuals = new DoubleIndividual[count];
-        for (int k = 0; k < randomIndividuals.length; k++) {
-            randomIndividuals[k] = this.people[(int)(Math.random()*this.people.length)];
-        }
-
-        return randomIndividuals;
-    }
-
-    public DoubleIndividual[] getTopIndividuals(int count) {
-        DoubleIndividual[] fittest = new DoubleIndividual[count];
-
-        this.sortPeopleByFitnessAscending();
-        Collections.reverse(Arrays.asList(this.people));
-        // get the N fittest people
-        for (int i = 0; i < count; i++) {
-            fittest[i] = this.people[i];
-        }
-
-        return fittest;
-    }
-
     public DoubleIndividual[] createNewChildren(int count) {
         DoubleIndividual[] parents = this.selectParents(count);
         return recombine(parents);
     }
 
     public DoubleIndividual[] mutateIndividualsByDouble(int count) {
-        DoubleIndividual[] individualsForMutation = this.getTopIndividuals(count);
-        //DoubleIndividual[] individualsForMutation = this.getRandomIndividuals(count);
+        DoubleIndividual[] individualsForMutation = this.selectTopIndividuals(count);
+        //DoubleIndividual[] individualsForMutation = this.selectRandomly(count);
 
         //Initialize some variables
         this.initializeMeanAndVariance();
@@ -161,40 +140,75 @@ public class Population {
         }
     }
 
-    private DoubleIndividual[] selectParentsbyTournament(int count){
+    /*
+    SELECTION ALGORITHMS
+     */
+    private DoubleIndividual[] selectParents(int count) {
+        switch (this.parentSelectionType){
+            case RANDOM:
+                return selectRandomly(count);
+            case ROULETTE_WHEEL:
+                return selectRouletteWheel(count);
+            case TOURNAMENT:
+                return selectTournament(count);
+            case FITTEST:
+                return selectTopIndividuals(count);
+        }
+
+        return null;
+    }
+
+    public DoubleIndividual[] selectRandomly(int count) {
+        DoubleIndividual[] randomIndividuals = new DoubleIndividual[count];
+        for (int k = 0; k < randomIndividuals.length; k++) {
+            randomIndividuals[k] = this.people[(int)(Math.random()*this.people.length)];
+        }
+
+        return randomIndividuals;
+    }
+
+    public DoubleIndividual[] selectTopIndividuals(int count) {
+        DoubleIndividual[] fittest = new DoubleIndividual[count];
+
+        this.sortPeopleByFitnessAscending();
+        Collections.reverse(Arrays.asList(this.people));
+        // get the N fittest people
+        for (int i = 0; i < count; i++) {
+            fittest[i] = this.people[i];
+        }
+
+        return fittest;
+    }
+
+    private DoubleIndividual[] selectTournament(int count){
         //System.out.println("SELECT PARENTS BY TOURNAMENT");
         DoubleIndividual[] parents = new DoubleIndividual[count];
         DoubleIndividual[] peopleCopy = ArrayHelper.copyArray(this.people);
         for (int k = 0; k < count; k++) {
-            int pick1 = (int) (Math.random()*peopleCopy.length);
-            int pick2 = (int) (Math.random()*peopleCopy.length);
-            int pick3 = (int) (Math.random()*peopleCopy.length);
-            System.out.println(peopleCopy[pick1].getFitness());
-            System.out.println(peopleCopy[pick2].getFitness());
-            System.out.println(peopleCopy[pick3].getFitness());
-            if(peopleCopy[pick1].getFitness() >= peopleCopy[pick2].getFitness() && peopleCopy[pick1].getFitness() >= peopleCopy[pick3].getFitness()) {
-                parents[k] = peopleCopy[pick1];
-                peopleCopy = ArrayHelper.removeElementFromArray(peopleCopy, pick1);
+            int indexOfHighest = -1;
+            double fitnessOfHighest = -100;
+            //Dynamic tournament size
+            //System.out.println("Tournament");
+            for(int i = 0; i < Constants.TOURNAMENT_SIZE; i++){
+                int currentIndex = (int) (Math.random()*peopleCopy.length);
+                double currentFitness = peopleCopy[currentIndex].getFitness();
+                //System.out.println(currentFitness);
+                if(currentFitness > fitnessOfHighest){
+                    fitnessOfHighest = currentFitness;
+                    indexOfHighest = currentIndex;
+                }
             }
-            else if(peopleCopy[pick2].getFitness() >= peopleCopy[pick1].getFitness() && peopleCopy[pick2].getFitness() >= peopleCopy[pick3].getFitness()) {
-                parents[k] = peopleCopy[pick2];
-                peopleCopy = ArrayHelper.removeElementFromArray(peopleCopy, pick2);
-            }
-            else if(peopleCopy[pick3].getFitness() >= peopleCopy[pick1].getFitness() && peopleCopy[pick3].getFitness() >= peopleCopy[pick2].getFitness()) {
-                parents[k] = peopleCopy[pick3];
-                peopleCopy = ArrayHelper.removeElementFromArray(peopleCopy, pick3);
-            }
-            if(parents[k] == null){
-                System.out.println("Not assigned");
-            }
-
+            //System.out.print("highest fitness ");
+            //System.out.println(fitnessOfHighest);
+            parents[k] = peopleCopy[indexOfHighest];
+            //parents[k].printGenotype();
             //parents[k].print();
         }
 
         return parents;
     }
 
-    private DoubleIndividual[] selectParentsByRouletteWheel(int count) {
+    private DoubleIndividual[] selectRouletteWheel(int count) {
         // initialize new array for parents
         DoubleIndividual[] parents = new DoubleIndividual[count];
 
@@ -239,19 +253,6 @@ public class Population {
         return parents;
     }
 
-    private DoubleIndividual[] selectParents(int count) {
-        switch (this.parentSelectionType){
-            case RANDOM:
-                return getRandomIndividuals(count);
-            case ROULETTE_WHEEL:
-                return selectParentsByRouletteWheel(count);
-            case TOURNAMENT:
-                return selectParentsbyTournament(count);
-        }
-
-        return null;
-    }
-
     private DoubleIndividual[] recombine(DoubleIndividual[] parents) {
         //TODO which parents mate with each other? neighborhood relation on sorted or randomly shuffled array?
         ArrayHelper.shuffleArray(parents);
@@ -267,9 +268,15 @@ public class Population {
     }
 
     public void recalculateFitness() {
+        double highest = -1000;
+        double current;
         for (DoubleIndividual individual : this.people) {
-            individual.calculateFitness(true);
+            current = individual.calculateFitness();
+            if(current > highest){
+                highest = current;
+            }
         }
+        this.highestFitness = highest;
     }
 
     // Calculate the sum over all individuals' fitnesses
@@ -288,4 +295,8 @@ public class Population {
     //private void sortPeopleByFitnessDescending(){
     //    Arrays.sort(this.people, Comparator.comparingDouble(DoubleIndividual::getFitness).reversed());
     //}
+
+    public double getHighestFitness(){
+        return this.highestFitness;
+    }
 }
