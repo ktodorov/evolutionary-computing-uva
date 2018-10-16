@@ -9,12 +9,22 @@ jar cmf MainClass.txt submission.jar player65.class *.class
 jar uf contest.jar player65.class *.class
 java -jar testrun.jar -submission=player65 -evaluation=BentCigarFunction -seed=1
 
-SphereEvaluation  best result - 11.10.2018:
- - Score -  9.999944208243948
- - Population size -  90
- - Fittest size -  4
- - Recombination size -  70
- - Mutation size -  16
+best parameters
+	sphere:
+		population size - 32
+		fittest - 4
+		recombination - 16
+		mutation - 12
+	bent cigar:
+		population size - 34
+		fittest - 6
+		recombination - 16
+		mutation - 12
+	schaffers:
+		population size - 45
+		fittest - 0
+		recombination - 38
+		mutation - 7
 */
 
 public class player65 implements ContestSubmission

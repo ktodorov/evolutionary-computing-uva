@@ -1,5 +1,6 @@
 function InvokeFunction
 {
+
     Param ([int]$populationSize, [int]$fittestSize, [int]$recombinationSize, [int]$mutationSize, [string]$function)
 
     $maxScore = 0
@@ -94,17 +95,17 @@ if (!([string]::IsNullOrEmpty($compilationOutput)))
 }
 
 jar cmf MainClass.txt submission.jar player65.class *.class
-jar uf contest.jar player65.class *.class
+jar uf submission.jar player65.class *.class
 
 # TuneFunction -function SphereEvaluation
 # TuneFunction -function BentCigarFunction
 # TuneFunction -function SchaffersEvaluation
 # TuneFunction -function KatsuuraEvaluation
-$maxScore, $minScore, $avgScore = & InvokeFunction -populationSize 32 -fittestSize 4 -recombinationSize 16 -mutationSize 12 -function SphereEvaluation 2>&1
-Write-Host "Sphere: min - " $minScore "| max - " $maxScore "| avg - $avgScore"
-$maxScore, $minScore, $avgScore = & InvokeFunction -populationSize 34 -fittestSize 6 -recombinationSize 16 -mutationSize 12 -function BentCigarFunction 2>&1
-Write-Host "Bent cigar: min - $minScore | max - $maxScore | avg - $avgScore"
-$maxScore, $minScore, $avgScore = & InvokeFunction -populationSize 45 -fittestSize 0 -recombinationSize 38 -mutationSize 6 -function SchaffersEvaluation 2>&1
-Write-Host "Schaffers: min - $minScore | max - $maxScore | avg - $avgScore"
+# $maxScore, $minScore, $avgScore = & InvokeFunction -populationSize 32 -fittestSize 4 -recombinationSize 16 -mutationSize 12 -function SphereEvaluation 2>&1
+# Write-Host "Sphere: min - " $minScore "| max - " $maxScore "| avg - $avgScore"
+# $maxScore, $minScore, $avgScore = & InvokeFunction -populationSize 34 -fittestSize 6 -recombinationSize 16 -mutationSize 12 -function BentCigarFunction 2>&1
+# Write-Host "Bent cigar: min - $minScore | max - $maxScore | avg - $avgScore"
+# $maxScore, $minScore, $avgScore = & InvokeFunction -populationSize 45 -fittestSize 0 -recombinationSize 38 -mutationSize 6 -function SchaffersEvaluation 2>&1
+# Write-Host "Schaffers: min - $minScore | max - $maxScore | avg - $avgScore"
 # $maxScore, $minScore = & InvokeFunction -populationSize 45 -fittestSize 3 -recombinationSize 36 -mutationSize 6 -function KatsuuraEvaluation 2>&1
 # Write-Host "Katsuura: min - " $minScore "| max - " $maxScore
