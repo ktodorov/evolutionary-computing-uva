@@ -15,5 +15,7 @@ public class Constants{
 
     public final static int TOURNAMENT_SIZE = 3;
 
-    public final static double K_FOR_RANKED_BASED_PROBABILITIES = 0.5;
+    public final static double K_FOR_EXP_RANKING = 0.5;
+
+    public final static double K_FOR_LIN_RANKING = 2;
 }

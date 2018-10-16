@@ -84,9 +84,8 @@ public class Population {
                 this.standardDeviation[j] += Math.pow(this.people[p].getGenotypeDouble()[j] - this.mean[j], 2);
             }
             this.standardDeviation[j] /= this.people.length-1;
-            //this.standardDeviation[j] -= Math.pow(this.mean[j], 2);
             if(this.standardDeviation[j] < 0){
-                System.out.print("SD ");
+                System.out.print("SD is wrecked.");
             }
             this.standardDeviation[j] = Math.sqrt(this.standardDeviation[j]);
             this.standardDeviation[j] = this.standardDeviation[j] * Math.exp(t1 * constantGaussian + t2 * changingGauss[j]);
@@ -132,9 +131,23 @@ public class Population {
         }
     }
 
-    private void createProbabilitiesBasedOnRank(){
+    private void createProbabilitiesBasedOnLinearRanking(){
         sortPeopleByFitnessAscending();
-        double c = Constants.K_FOR_RANKED_BASED_PROBABILITIES;
+        double c = Constants.K_FOR_LIN_RANKING;
+        double meanFitness = 0;
+        for (int i = 0; i < this.people.length; i++) {
+            meanFitness += this.people[i].getFitness();
+        }
+        double sum = meanFitness;
+        meanFitness /= this.people.length;
+        for (int j = 0; j < this.people.length; j++) {
+            this.people[j].setProbabilities(((2-c)/meanFitness + 2*j*(c-1)/(meanFitness*(meanFitness-1)))/sum);
+        }
+    }
+
+    private void createProbabilitiesBasedOnExponentialRanking(){
+        sortPeopleByFitnessAscending();
+        double c = Constants.K_FOR_EXP_RANKING;
         for (int i = 0; i < this.people.length; i++) {
             this.people[i].setProbabilities(Math.pow(c, this.people.length-1-i)*(c-1) / (Math.pow(c, this.people.length)-1));
         }
@@ -213,7 +226,8 @@ public class Population {
         DoubleIndividual[] parents = new DoubleIndividual[count];
 
         // create probabilities for rank based roulette and sort the people in descending order
-        this.createProbabilitiesBasedOnRank();
+        //this.createProbabilitiesBasedOnExponentialRanking();
+        this.createProbabilitiesBasedOnLinearRanking();
         DoubleIndividual[] peopleCopy = ArrayHelper.copyArray(this.people);
         double overallFitness = this.calculateOverallFitness();
         int currentMember = 0;
