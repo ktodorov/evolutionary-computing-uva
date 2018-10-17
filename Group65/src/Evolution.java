@@ -21,6 +21,7 @@ public class Evolution {
         int initialFittestSize = Constants.FITTEST_SIZE;
         int initialRecombinationSize = Constants.RECOMBINATION_SIZE;
         int initialMutationSize = Constants.MUTATION_SIZE;
+        RankingType rankingType = Constants.DEFAULT_RANKING_TYPE;
         ParentSelectionType parentSelectionType = Constants.CURRENT_PARENT_SELECTION_TYPE;
 
         String populationSizeString = System.getProperty("populationSize");
@@ -48,7 +49,12 @@ public class Evolution {
             parentSelectionType = ParentSelectionType.valueOf(parentSelectionTypeString);
         }
 
-        Population tribe = new Population(parentSelectionType, populationSize);
+        String rankingTypeString = System.getProperty("rankingType");
+        if (rankingTypeString != null && !rankingTypeString.isEmpty()) {
+            rankingType = RankingType.valueOf(rankingTypeString);
+        }
+
+        Population tribe = new Population(parentSelectionType, populationSize, rankingType);
         
         int cycles = eval_limit / populationSize;
         int last_cycles_without_mutation = cycles / 20;
@@ -83,9 +89,7 @@ public class Evolution {
 
             System.out.println(maxFitness);
 
-            Population nextGeneration = new Population(
-                parentSelectionType,
-                populationSize);
+            Population nextGeneration = new Population(parentSelectionType, populationSize, rankingType);
             nextGeneration.clearPopulation();
 
             // RECOMBINATION

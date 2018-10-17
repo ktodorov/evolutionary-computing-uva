@@ -12,6 +12,8 @@ public class Constants{
     public final static int FITTEST_SIZE = POPULATION_SIZE - RECOMBINATION_SIZE - MUTATION_SIZE;
 
     public final static ParentSelectionType CURRENT_PARENT_SELECTION_TYPE = ParentSelectionType.ROULETTE_WHEEL;
+    
+    public final static RankingType DEFAULT_RANKING_TYPE = RankingType.LINEAR;
 
     public final static int TOURNAMENT_SIZE = 3;
 

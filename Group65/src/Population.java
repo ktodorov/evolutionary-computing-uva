@@ -7,17 +7,20 @@ public class Population {
     private double highestFitness;
     private DoubleIndividual[] people;
     private ParentSelectionType parentSelectionType;
+    private RankingType rankingType;
     private double[] mean;
     private double[] standardDeviation;
     private int populationSize;
 
     public Population(
         ParentSelectionType parentSelectionType,
-        int populationSize) {
+        int populationSize,
+        RankingType rankingType) {
 
         this.parentSelectionType = parentSelectionType;
         this.people = new DoubleIndividual[populationSize];
         this.populationSize = populationSize;
+        this.rankingType = rankingType;
         this.initializeMeanAndVariance();
 
         // Initialize each individual
@@ -25,6 +28,7 @@ public class Population {
             this.people[i] = new DoubleIndividual();
         }
     }
+
     public void clearPopulation(){
         this.people = new DoubleIndividual[0];
     }
@@ -41,11 +45,13 @@ public class Population {
 
     public Population(
         ParentSelectionType parentSelectionType,
-        DoubleIndividual[] individuals) {
+        DoubleIndividual[] individuals,
+        RankingType rankingType) {
 
         this.parentSelectionType = parentSelectionType;
         this.people = new DoubleIndividual[0];
         this.populationSize = individuals.length;
+        this.rankingType = rankingType;
         this.addIndividuals(individuals);
     }
 
@@ -235,8 +241,13 @@ public class Population {
         DoubleIndividual[] parents = new DoubleIndividual[count];
 
         // create probabilities for rank based roulette and sort the people in descending order
-        //this.createProbabilitiesBasedOnExponentialRanking();
-        this.createProbabilitiesBasedOnLinearRanking();
+        if (this.rankingType == RankingType.LINEAR) {
+            this.createProbabilitiesBasedOnLinearRanking();
+        }
+        else {
+            this.createProbabilitiesBasedOnExponentialRanking();
+        }
+        
         DoubleIndividual[] peopleCopy = ArrayHelper.copyArray(this.people);
         double overallFitness = this.calculateOverallFitness();
         int currentMember = 0;
