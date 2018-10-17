@@ -39,15 +39,9 @@ function InvokeFunction
     $avgScore = -1
     $avgCycleNumber = -1
     $i = 0
-    $cyclesCount = 100
     $scores = @()
     $cycles = @()
     $maxFitnessPerCycle = @()
-
-    for ($j = 0; $j -lt $cyclesCount; $j++)
-    {
-        $maxFitnessPerCycle += 0.0
-    }
 
     while ($i -lt $runs)
     {      
@@ -56,15 +50,29 @@ function InvokeFunction
                     " -DrankingType=" + $rankingType + " -jar testrun.jar -submission=player65 -evaluation=" + $function + ' -seed=1 2>&1'
         # Write-Host $command
         $output = Invoke-Expression $command
-        Write-Host $output
+        # Write-Host $output
         $splittedOutput = $output.split(' ')
         
-        $maxFitnessPerCycle[0] = ($maxFitnessPerCycle[0], [System.Decimal]$splittedOutput[0] | Measure-Object -Max).Maximum
 
-        for ($j = 1; $j -lt $cyclesCount; $j++)
+        for ($j = 0; $j -lt $splittedOutput.length - 6; $j++)
         {
             $newDecimal = [System.Decimal]$splittedOutput[$j]
-            $maxFitnessPerCycle[$j] = ($maxFitnessPerCycle[$j], $newDecimal, $maxFitnessPerCycle[$j - 1] | Measure-Object -Max).Maximum
+            if ($maxFitnessPerCycle.Length -eq 0)
+            {
+                $maxFitnessPerCycle += $newDecimal
+            }
+            elseif ($j -eq 0) 
+            {
+                $maxFitnessPerCycle[$j] = ($newDecimal, $maxFitnessPerCycle[$j] | Measure-Object -Max).Maximum
+            }
+            elseif ($maxFitnessPerCycle.length -le $j)
+            {
+                $maxFitnessPerCycle += ($newDecimal, $maxFitnessPerCycle[$j - 1] | Measure-Object -Max).Maximum
+            }
+            else
+            {
+                $maxFitnessPerCycle[$j] = ($maxFitnessPerCycle[$j], $newDecimal, $maxFitnessPerCycle[$j - 1] | Measure-Object -Max).Maximum
+            }
         }
 
         # Write-Host "splitted output length - " $splittedOutput.length
