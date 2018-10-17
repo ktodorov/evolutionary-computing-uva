@@ -59,7 +59,7 @@ public class Population {
     }
 
     public DoubleIndividual[] mutateIndividualsByDouble(int count) {
-        DoubleIndividual[] individualsForMutation = this.selectTopIndividuals(count);
+        DoubleIndividual[] individualsForMutation = this.selectRouletteWheel(count);
         //DoubleIndividual[] individualsForMutation = this.selectRandomly(count);
 
         //Initialize some variables
@@ -96,6 +96,7 @@ public class Population {
             double[] newGenotype = new double[10];
             for (int j = 0; j < Constants.DIMENSIONS; j++) {
                 newGenotype[j] = individualsForMutation[k].getGenotypeDouble()[j] + this.standardDeviation[j] * changingGauss[j];
+
                 if (newGenotype[j] < -5) {
                     newGenotype[j] = -5;
                 }
@@ -202,6 +203,7 @@ public class Population {
 
     private DoubleIndividual[] selectTournament(int count){
         //System.out.println("SELECT PARENTS BY TOURNAMENT");
+
         DoubleIndividual[] parents = new DoubleIndividual[count];
         DoubleIndividual[] peopleCopy = ArrayHelper.copyArray(this.people);
         for (int k = 0; k < count; k++) {
