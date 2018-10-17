@@ -116,6 +116,11 @@ public class DoubleIndividual {
     protected double calculateFitness() {
         Evolution.FITNESS_EVALUATIONS++; //Easier to track evaluations during testing
         this.fitness = (double) Evolution.eval.evaluate(this.genotype);
+        // if (Double.isNaN(this.fitness)) {
+        //     System.out.println("WRONG INDIVIDUAL:");
+        //     this.printGenotype();
+        // }
+
         this.fitness = Double.isNaN(this.fitness) ? -42 : this.fitness;
         if(this.fitness == -42){
             //this.initRandomGenotype();

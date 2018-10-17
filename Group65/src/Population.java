@@ -96,6 +96,13 @@ public class Population {
             double[] newGenotype = new double[10];
             for (int j = 0; j < Constants.DIMENSIONS; j++) {
                 newGenotype[j] = individualsForMutation[k].getGenotypeDouble()[j] + this.standardDeviation[j] * changingGauss[j];
+                if (newGenotype[j] < -5) {
+                    newGenotype[j] = -5;
+                }
+                
+                if (newGenotype[j] > 5) {
+                    newGenotype[j] = 5;
+                }
             }
             if(individualsForMutation[k].containsNaN()){
                 System.out.println("before");
@@ -206,7 +213,7 @@ public class Population {
                 int currentIndex = (int) (Math.random()*peopleCopy.length);
                 double currentFitness = peopleCopy[currentIndex].getFitness();
                 //System.out.println(currentFitness);
-                if(currentFitness > fitnessOfHighest){
+                if(currentFitness > fitnessOfHighest || indexOfHighest == -1){
                     fitnessOfHighest = currentFitness;
                     indexOfHighest = currentIndex;
                 }
