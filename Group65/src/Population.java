@@ -320,4 +320,20 @@ public class Population {
     public double getHighestFitness(){
         return this.highestFitness;
     }
+
+    public double getAverage(){
+        return calculateOverallFitness() / this.people.length;
+    }
+
+    public double getStandardDeviation(){
+        double average = getAverage();
+
+        double numerator = 0.0;
+        for (DoubleIndividual individual : this.people) {
+            numerator += Math.pow((individual.getFitness() - average), 2);
+        }
+
+        double result = Math.sqrt(numerator / (this.people.length - 1));
+        return result;
+    }
 }
