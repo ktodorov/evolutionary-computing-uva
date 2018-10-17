@@ -21,6 +21,7 @@ public class Evolution {
         int initialFittestSize = Constants.FITTEST_SIZE;
         int initialRecombinationSize = Constants.RECOMBINATION_SIZE;
         int initialMutationSize = Constants.MUTATION_SIZE;
+        ParentSelectionType parentSelectionType = Constants.CURRENT_PARENT_SELECTION_TYPE;
 
         String populationSizeString = System.getProperty("populationSize");
         if (populationSizeString != null && !populationSizeString.isEmpty()) {
@@ -41,10 +42,13 @@ public class Evolution {
         if (mutationSizeString != null && !mutationSizeString.isEmpty()) {
             initialMutationSize = Integer.parseInt(mutationSizeString);
         }
-        
-        Population tribe = new Population(
-            Constants.CURRENT_PARENT_SELECTION_TYPE,
-            populationSize);
+
+        String parentSelectionTypeString = System.getProperty("parentSelectionType");
+        if (parentSelectionTypeString != null && !parentSelectionTypeString.isEmpty()) {
+            parentSelectionType = ParentSelectionType.valueOf(parentSelectionTypeString);
+        }
+
+        Population tribe = new Population(parentSelectionType, populationSize);
         
         int cycles = eval_limit / populationSize;
         int last_cycles_without_mutation = cycles / 20;
@@ -53,10 +57,10 @@ public class Evolution {
         int recombinationSize = initialRecombinationSize;
 
         double previousCycleFitness = -1000;
-        for (int i = 0; i < cycles; i++) {
-            //System.out.print("GENERATION ");
-            //System.out.println(i);
+        int maxFitnessCycle = 0;
+        double maxFitness = 0.0;
 
+        for (int i = 0; i < cycles; i++) {
             // If we reach the last last_cycles_without_mutation cycles, 
             // we must stop mutating in order to preserve the currently found good population
             if (cycles - i < last_cycles_without_mutation) {
@@ -71,19 +75,24 @@ public class Evolution {
             }
 
             tribe.recalculateFitness();
-            //For testing: Percentage change of last to current generational max fitness!
-            //System.out.println(Math.round(1000*((tribe.getHighestFitness()/previousCycleFitness)*100-100))/1000.0);
-            //previousCycleFitness = tribe.getHighestFitness();
-            //tribe.print();
+            double currentHighestFitness = tribe.getHighestFitness();
+            if(currentHighestFitness > maxFitness) {
+                maxFitness = currentHighestFitness;
+                maxFitnessCycle = i;
+            }
+
+            System.out.println(maxFitness);
 
             Population nextGeneration = new Population(
-                Constants.CURRENT_PARENT_SELECTION_TYPE,
+                parentSelectionType,
                 populationSize);
             nextGeneration.clearPopulation();
 
             // RECOMBINATION
-            DoubleIndividual[] newChildren = tribe.createNewChildren(recombinationSize);
-            nextGeneration.addIndividuals(newChildren);
+            if (recombinationSize > 0) {
+                DoubleIndividual[] newChildren = tribe.createNewChildren(recombinationSize);
+                nextGeneration.addIndividuals(newChildren);
+            }
 
             // MUTATION
             if (mutationSize > 0) {
@@ -98,5 +107,11 @@ public class Evolution {
 
             tribe = nextGeneration;
         }
+
+        // System.out.println("Max fitness found: " + maxFitness);
+        System.out.println(maxFitnessCycle);
+        // System.out.println("Average: " + tribe.getAverage());
+        // System.out.println("Standard deviation: " + tribe.getStandardDeviation());
+        // tribe.print();
     }
 }
